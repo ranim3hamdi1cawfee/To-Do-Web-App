@@ -1,0 +1,275 @@
+
+.mt-main {
+    max-width: 780px;           
+    margin: 0 auto;             
+    padding: 2rem 1.5rem 4rem;  
+    display: flex;
+    flex-direction: column;     
+    gap: 1.5rem;                
+}
+
+
+.mt-user-badge {
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 99px;        
+    padding: 0.3rem 0.9rem;
+    font-family: var(--font-mono);
+}
+
+.mt-back-btn {
+    font-size: 12px;
+    color: var(--accent);
+    background: none;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 0.35rem 0.9rem;
+    text-decoration: none;      
+    font-family: var(--font-mono);
+    transition: all var(--transition);
+}
+.mt-back-btn:hover {
+    background: rgba(200, 251, 75, 0.1);
+}
+
+.mt-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.mt-title {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--text);
+}
+.mt-badge {
+    font-size: 10px;
+    letter-spacing: 1.5px;      
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 99px;
+    font-family: var(--font-mono);
+}
+
+.mt-badge--admin {
+    background: rgba(200, 251, 75, 0.12);
+    color: var(--accent);
+    border: 1px solid rgba(200, 251, 75, 0.3);
+}
+
+.mt-badge--user {
+    background: rgba(95, 184, 255, 0.12);
+    color: var(--accent3);
+    border: 1px solid rgba(95, 184, 255, 0.3);
+}
+
+.mt-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;  }             
+
+.mt-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;   
+    gap: 1rem;
+}
+
+.mt-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.mt-field label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.mt-field--locked label {
+    opacity: 0.65;
+}
+
+.mt-field--locked input,
+.mt-field--locked textarea {
+    opacity: 0.45;
+    cursor: not-allowed;       
+    border-style: dashed; 
+}
+
+.mt-field input[type="text"],
+.mt-field input[type="date"],
+.mt-field textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 0.65rem 0.85rem;
+    outline: none;              
+    resize: none;              
+    width: 100%;
+}
+
+.mt-field input:not([readonly]):focus,
+.mt-field textarea:not([readonly]):focus {
+    border-color: var(--accent);
+}
+
+
+.mt-field input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) opacity(0.4);
+    cursor: pointer;
+}
+
+.mt-priority-grid,
+.mt-status-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);   /* 3 colonnes égales */
+    gap: 0.5rem;
+}
+.mt-priority-opt,
+.mt-status-opt {
+    cursor: pointer;
+}
+.mt-priority-opt input[type="radio"],
+.mt-status-opt input[type="radio"] {
+    display: none;
+}
+.mt-priority-card,
+.mt-status-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 0.4rem;
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 12px;
+    text-align: center;
+    transition: all var(--transition);
+    user-select: none; 
+}
+
+.mt-priority-opt--low input:checked ~ .mt-priority-card {
+    border-color: var(--low);
+    background: rgba(95, 184, 255, 0.12);
+    color: var(--low);
+}
+
+.mt-priority-opt--medium input:checked ~ .mt-priority-card {
+    border-color: var(--medium);
+    background: rgba(245, 200, 66, 0.12);
+    color: var(--medium);
+}
+
+.mt-priority-opt--high input:checked ~ .mt-priority-card {
+    border-color: var(--high);
+    background: rgba(255, 95, 95, 0.12);
+    color: var(--high);
+}
+.mt-status-opt--todo input:checked ~ .mt-status-card {
+    border-color: var(--muted);
+    background: rgba(107, 107, 128, 0.12);
+    color: var(--text);
+}
+
+.mt-status-opt--doing input:checked ~ .mt-status-card {
+    border-color: var(--accent3);
+    background: rgba(95, 184, 255, 0.12);
+    color: var(--accent3);
+}
+
+.mt-status-opt--done input:checked ~ .mt-status-card {
+    border-color: var(--accent);
+    background: rgba(200, 251, 75, 0.12);
+    color: var(--accent);
+}
+
+/* Petit effet au survol */
+.mt-priority-card:hover,
+.mt-status-card:hover {
+    border-color: var(--muted);
+}
+.mt-actions {
+    display: flex;
+    justify-content: flex-end;  /* boutons collés à droite */
+    gap: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.mt-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: var(--radius);
+    padding: 0.75rem 1.3rem;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all var(--transition);
+    border: none;
+    text-decoration: none;  
+}
+
+.mt-btn--cancel {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+}
+.mt-btn--cancel:hover {
+    border-color: var(--high);
+    color: var(--high);
+}
+
+.mt-btn--save {
+    background: var(--accent);
+    color: #000;
+}
+.mt-btn--save:hover {
+    background: #d4ff5a;       
+}
+.mt-btn--save:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.mt-feedback {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-family: var(--font-mono);
+    border: 1px solid var(--border);
+}
+
+.mt-feedback--success {
+    background: rgba(200, 251, 75, 0.08);
+    border-color: rgba(200, 251, 75, 0.3);
+    color: var(--accent);
+}
+
+.mt-feedback--error {
+    background: rgba(255, 95, 95, 0.08);
+    border-color: rgba(255, 95, 95, 0.3);
+    color: var(--high);
+}
+
+@media (max-width: 600px) {
+    .mt-main      { padding: 1rem; }
+    .mt-row       { grid-template-columns: 1fr; }      
+    .mt-actions   { flex-direction: column; }           
+    .mt-btn       { width: 100%; justify-content: center; }
+}
