@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Task List</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="noise"></div>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Task List</h2>
+
+        <span class="panel-tag"> TASKS </span>
+      </div>
+
+      <div class="top-stats">
+        <div class="stat-pill">
+          <span class="stat-num"> 0 </span>
+
+          <span class="stat-label"> Active </span>
+        </div>
+
+        <div class="stat-pill urgent">
+          <span class="stat-num"> 0 </span>
+
+          <span class="stat-label"> Urgent </span>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Task</th>
+
+            <th>Description</th>
+
+            <th>Start Date</th>
+
+            <th>Priority</th>
+
+            <th>Status</th>
+
+            <th>Deadline</th>
+
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>Task 1</td>
+
+            <td>Create homepage design</td>
+
+            <td>20/05/2026</td>
+
+            <td>
+              <span class="badge high"> High </span>
+            </td>
+
+            <td>In Progress</td>
+
+            <td>Friday</td>
+
+            <td class="actions">
+              <button class="done">✔</button>
+
+              <button class="edit">✎</button>
+
+              <button class="delete">✕</button>
+            </td>
+          </tr>
+
+          <tr>
+            <td>Task 2</td>
+
+            <td>Fix login page design</td>
+
+            <td>21/05/2026</td>
+
+            <td>
+              <span class="badge medium"> Medium </span>
+            </td>
+
+            <td>To Do</td>
+
+            <td>Monday</td>
+
+            <td class="actions">
+              <button class="done">✔</button>
+
+              <button class="edit">✎</button>
+
+              <button class="delete">✕</button>
+            </td>
+          </tr>
+
+          <tr>
+            <td>Task 3</td>
+
+            <td>Create dashboard page</td>
+
+            <td>22/05/2026</td>
+
+            <td>
+              <span class="badge low"> Low </span>
+            </td>
+
+            <td>Done</td>
+
+            <td>Wednesday</td>
+
+            <td class="actions">
+              <button class="done">✔</button>
+
+              <button class="edit">✎</button>
+
+              <button class="delete">✕</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+    <div class="toast-container"></div>
+    <script src="index.js"></script>
+  </body>
+</html>
