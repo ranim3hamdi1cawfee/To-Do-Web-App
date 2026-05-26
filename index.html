@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow — Planning Mode</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Styles supplémentaires pour la vue liste */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .list-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            transition: all var(--transition);
+        }
+        .list-card:hover {
+            border-color: var(--muted);
+            transform: translateX(4px);
+        }
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .list-title {
+            font-family: var(--font-head);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .list-actions {
+            display: flex;
+            gap: 0.4rem;
+        }
+        .list-desc {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+        }
+        .list-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.7rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 99px;
+            background: rgba(255,255,255,0.05);
+        }
+        .badge-low { color: var(--low); border-left: 2px solid var(--low); }
+        .badge-medium { color: var(--medium); border-left: 2px solid var(--medium); }
+        .badge-high { color: var(--high); border-left: 2px solid var(--high); }
+        .status-badge {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 0.2rem 0.7rem;
+            font-size: 0.7rem;
+        }
+        .btn-sm {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            color: var(--muted);
+            transition: all var(--transition);
+        }
+        .btn-sm:hover {
+            border-color: var(--text);
+            color: var(--text);
+        }
+        .btn-danger:hover {
+            border-color: var(--high);
+            color: var(--high);
+        }
+        .empty-list {
+            text-align: center;
+            color: var(--muted);
+            padding: 3rem;
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="noise"></div>
+
+    <header>
+        <div class="header-left">
+            <div class="logo-mark">TF</div>
+            <div>
+                <h1>TaskFlow</h1>
+                <span class="mode-badge">● Planning Mode</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="stat-pill">
+                <span class="stat-num" id="active-count">0</span>
+                <span class="stat-label">Active</span>
+            </div>
+            <div class="stat-pill stat-pill--accent">
+                <span class="stat-num" id="urgent-count">0</span>
+                <span class="stat-label">Urgent</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Panneau de création (inchangé) -->
+        <aside class="panel panel--create">
+            <div class="panel-header">
+                <h2>New Task</h2>
+                <span class="panel-tag">+CREATE</span>
+            </div>
+
+            <div class="form-group">
+                <label for="task-title">Task Title</label>
+                <input type="text" id="task-title" placeholder="What needs to be done?" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label for="task-desc">Details</label>
+                <textarea id="task-desc" placeholder="Describe the task..." rows="4"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Priority Level</label>
+                <div class="priority-grid">
+                    <label class="priority-option priority-option--low">
+                        <input type="radio" name="priority" value="low">
+                        <span class="priority-card">
+                            <span class="priority-icon">▽</span>
+                            <span>Low</span>
+                        </span>
+                    </label>
+                    <label class="priority-option priority-option--med">
+                        <input type="radio" name="priority" value="medium" checked>
+                        <span class="priority-card">
+                            <span class="priority-icon">◇</span>
+                            <span>Medium</span>
+                        </span>
+                    </label>
+                    <label class="priority-option priority-option--high">
+                        <input type="radio" name="priority" value="high">
+                        <span class="priority-card">
+                            <span class="priority-icon">△</span>
+                            <span>High</span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="task-due">Due Date</label>
+                <input type="date" id="task-due">
+            </div>
+
+            <button class="btn-add" id="btn-add">
+                <span class="btn-text">Add Task</span>
+                <span class="btn-icon">→</span>
+            </button>
+
+            <div class="form-feedback" id="form-feedback"></div>
+        </aside>
+
+        <!-- Nouvelle vue liste à la place du Kanban -->
+        <section class="panel panel--list">
+            <div class="panel-header">
+                <h2>All Tasks</h2>
+                <span class="panel-tag">LIST</span>
+            </div>
+            <div id="task-list-container" class="task-list">
+                <!-- Les tâches seront injectées ici -->
+                <div class="empty-list">No tasks yet. Create one →</div>
+            </div>
+        </section>
+    </main>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="index.js"></script>
+</body>
+</html>
