@@ -588,3 +588,86 @@ main {
     .header-right { gap: 0.5rem; }
     .progress-wrap { display: none; }
 }
+/* ===== STATUS GROUPS ===== */
+.status-group {
+    margin-bottom: 1.5rem;
+}
+
+.status-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.status-group-title {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.status-group-count {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    width: 22px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.status-group-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    min-height: 40px;
+    border-radius: var(--radius);
+    transition: all 0.2s;
+    padding: 4px;
+}
+
+.status-group-body.drag-over {
+    background: rgba(200, 251, 75, 0.05);
+    outline: 2px dashed var(--accent);
+    outline-offset: 2px;
+}
+
+/* ===== PRIORITY BORDERS ===== */
+.priority-border-low    { border-left: 3px solid var(--low) !important; }
+.priority-border-medium { border-left: 3px solid var(--medium) !important; }
+.priority-border-high   { border-left: 3px solid var(--high) !important; }
+
+/* ===== DRAGGING ===== */
+.list-card[draggable="true"] { cursor: grab; }
+.list-card[draggable="true"]:active { cursor: grabbing; }
+.list-card.dragging { opacity: 0.4; transform: scale(0.97); }
+
+/* ===== OVERDUE ===== */
+.overdue { color: var(--high) !important; }
+
+/* ===== FILTER BUTTONS ===== */
+.filter-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 0.25rem 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+}
+.filter-btn:hover { border-color: var(--muted); color: var(--text); }
+.filter-btn.filter-active { background: var(--surface); border-color: var(--text); color: var(--text); }
+.filter-low.filter-active { border-color: var(--low); color: var(--low); }
+.filter-medium.filter-active { border-color: var(--medium); color: var(--medium); }
+.filter-high.filter-active { border-color: var(--high); color: var(--high); }

@@ -14,7 +14,19 @@ function respond(int $code, mixed $data): void {
     exit;
 }
 
-// Correspondance status front <-> movement Symfony
+function requireLogin(): void {
+    if (!isset($_SESSION['user_id'])) {
+        respond(401, ['success' => false, 'error' => 'Non connecté.']);
+    }
+}
+
+function requireAdmin(): void {
+    requireLogin();
+    if ($_SESSION['role'] !== 'Admin') {
+        respond(403, ['success' => false, 'error' => 'Action réservée aux administrateurs.']);
+    }
+}
+
 const STATUS_TO_MOVEMENT = [
     'todo'  => 'andante',
     'doing' => 'moderato',
@@ -28,7 +40,6 @@ const MOVEMENT_TO_STATUS = [
 
 function normalizeTask(array $row): array {
     $tags = $row['tags'] ?? '[]';
-    // tags est stocké en JSON par Symfony
     $tagsDecoded = json_decode($tags, true);
     $description = is_array($tagsDecoded) ? implode(', ', $tagsDecoded) : ($tags ?? '');
     return [
@@ -49,6 +60,7 @@ $body   = json_decode(file_get_contents('php://input'), true) ?? [];
 switch ($method) {
 
     case 'GET':
+        requireLogin();
         $db  = getDB();
         $sql = 'SELECT * FROM task WHERE 1=1';
         $params = [];
@@ -64,6 +76,7 @@ switch ($method) {
         respond(200, ['success' => true, 'tasks' => $tasks]);
 
     case 'POST':
+        requireLogin();
         if (empty($body['title'])) respond(422, ['success' => false, 'error' => 'Titre obligatoire.']);
         $db = getDB();
         $stmt = $db->prepare('INSERT INTO task (title, priority, movement, due_date, tags)
@@ -81,6 +94,7 @@ switch ($method) {
         respond(201, ['success' => true, 'task' => normalizeTask($s->fetch())]);
 
     case 'PUT':
+        requireAdmin(); // seul admin peut modifier
         if (!$id) respond(400, ['success' => false, 'error' => 'id manquant.']);
         $db = getDB();
         $sets = []; $params = [':id' => $id];
@@ -107,6 +121,7 @@ switch ($method) {
         respond(200, ['success' => true, 'task' => normalizeTask($s->fetch())]);
 
     case 'DELETE':
+        requireAdmin(); // seul admin peut supprimer
         if (!$id) respond(400, ['success' => false, 'error' => 'id manquant.']);
         $db   = getDB();
         $stmt = $db->prepare('DELETE FROM task WHERE id = :id');
