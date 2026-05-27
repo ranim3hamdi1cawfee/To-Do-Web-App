@@ -17,7 +17,7 @@ $nav_img_src = $is_default ? '../../uploads/default_avatar.png' : '../../uploads
         <li><a href="../welcome/welcome.php">Home</a></li>
         <li><a href="../add-task/index.php">Add task</a></li>
         <li><a href="../list_task/tasks.php">Tasks list</a></li>
-        <li><a href="../stats/stats.php">Stats</a></li>
+        <li><a href="../Statistics/statistics.php">Stats</a></li>
         <li><a href="../login_logic/logout.php">Logout</a></li>
 
         <li class="nav-avatar">
