@@ -1,5 +1,5 @@
 <?php
-require_once("../login_logic/db.php");
+require_once("../login_logic/database.php");
 $nav_user_id = $_SESSION['user_id'];
 $nav_query = $conn->prepare("SELECT username, profile_image FROM user WHERE id = ?");
 $nav_query->bind_param("i", $nav_user_id);
@@ -8,9 +8,9 @@ $nav_result = $nav_query->get_result()->fetch_assoc();
 
 $nav_img = $nav_result['profile_image'];
 $is_default = (empty($nav_img) || $nav_img === 'default_avatar.png');
-$nav_img_src = $is_default ? '../uploads/default_avatar.png' : '../uploads/' . $nav_img;
+$nav_img_src = $is_default ? '../../uploads/default_avatar.png' : '../../uploads/' . $nav_img;
 ?>
-
+<link rel="stylesheet" href="../../css/style.css">
 <nav>
     <label class="logo">To_Do Web Application</label>
     <ul>

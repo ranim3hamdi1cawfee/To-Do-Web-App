@@ -2,7 +2,7 @@
 session_start();
 require_once("auth_guard.php");
 requireLogin();
-require_once("../login_logic/db.php");
+require_once("database.php");
 
 if (isset($_GET['id'])) {
     $id = (int)$_GET['id'];

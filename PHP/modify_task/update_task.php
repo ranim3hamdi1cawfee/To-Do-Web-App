@@ -8,7 +8,7 @@
 session_start();
 header('Content-Type: application/json');
 
-require_once 'db.php';
+require_once '../login_logic/db.php';
 
 // Vérifier que l'utilisateur est connecté
 if (!isset($_SESSION['user_id'])) {
@@ -116,5 +116,5 @@ else {
 // Tout s'est bien passé : réponse de succès
 echo json_encode([
     'success' => true,
-    'message' => 'Tâche modifiée avec succès.'
+    'message' => 'Task updated successfully.'
 ]);

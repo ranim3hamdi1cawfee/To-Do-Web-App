@@ -1,10 +1,11 @@
 <?php
 session_start();
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login_logic/login.php");
     exit();
 }
-require_once("../login_logic/db.php");
+require_once("../login_logic/database.php");
 
 $user_id = $_SESSION['user_id'];
 
@@ -18,7 +19,7 @@ $default_img = 'default_avatar.png';
 $has_custom_img = (!empty($user['profile_image']) && $user['profile_image'] !== $default_img);
 
 
-$display_img = $has_custom_img ? '../uploads/' . $user['profile_image'] : null;
+$display_img = $has_custom_img ? '../../uploads/' . $user['profile_image'] : null;
 
 $hour = (int)date('H');
 $greeting = ($hour < 12) ? "Good morning" : (($hour < 18) ? "Good afternoon" : "Good evening");
@@ -54,7 +55,7 @@ $greeting = ($hour < 12) ? "Good morning" : (($hour < 18) ? "Good afternoon" : "
         <div class="divider"></div>
 
         <div style="margin-top: 10px; width: 100%; max-width: 220px;">
-            <a href="../tasks/tasks.php" class="cta">Resume Tasks →</a>
+            <a href="../add-task/index.php" class="cta">Resume Tasks →</a>
         </div>
     </main>
 

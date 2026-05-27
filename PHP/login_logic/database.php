@@ -1,6 +1,6 @@
 <?php
 $host = "127.0.0.1";
-$dbname = "todo-login";
+$dbname = "taskflow"; 
 $user = "root";
 $password = "";
 $port = 3307;

@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-require_once("db.php"); 
+require_once("database.php"); 
 require_once("auth_guard.php"); 
 
 if (!isset($_GET['id'])) {
@@ -57,7 +57,13 @@ if (!empty($user['group_id'])) {
         <h2 class="text-white mb-4" style="font-size:50px; font-weight: bold; text-align: center;">User Profile</h2>
         
         <div class="container-box" style="max-width: 500px; margin: 0 auto;">
-            
+            <div style="display:flex; justify-content:center; margin-bottom:20px;">
+                <?php if (!empty($user['profile_image']) && $user['profile_image'] !== 'default_avatar.png'): ?>
+                    <img src="../../uploads/<?php echo htmlspecialchars($user['profile_image']); ?>"
+                         width="80" height="80"
+                         style="border-radius:50%; object-fit:cover; border:3px solid var(--primary);">
+                <?php endif; ?>
+            </div>
             <div class="decor">
                 <label class="label">User Name</label>
                 <span style="flex:1; padding-left:10px; font-weight: 600;"><?php echo htmlspecialchars($user['username']); ?></span>

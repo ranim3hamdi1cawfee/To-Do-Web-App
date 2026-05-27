@@ -6,8 +6,8 @@
 
 session_start();
 
-require_once 'db.php';
-require_once 'auth_guard.php';
+require_once '../login_logic/db.php';
+require_once '../login_logic/auth_guard.php';
 
 // Vérifier que l'utilisateur est connecté
 requireLogin();
@@ -21,7 +21,7 @@ $isAdmin  = ($role === 'Admin');
 $taskId = (int) $_GET['id'];
 
 if ($taskId <= 0) {
-    die("Erreur : aucun id de tâche dans l'URL.");
+    die("Error: no task ID provided.");
 }
 
 // Charger la tâche depuis la base
@@ -31,7 +31,7 @@ $stmt->execute([':id' => $taskId]);
 $task = $stmt->fetch();
 
 if (!$task) {
-    die("Erreur : tâche introuvable.");
+    die("Error: task not found.");
 }
 
 // Traduire les valeurs de la base vers le format du formulaire :
@@ -63,7 +63,7 @@ $disabled = $isAdmin ? '' : 'disabled';
     <meta charset="UTF-8">
     <title>Modify Task</title>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../../css/style.css">
     <link rel="stylesheet" href="modify_task.css">
 </head>
 <body>
@@ -166,7 +166,7 @@ $disabled = $isAdmin ? '' : 'disabled';
 
             <!-- BOUTONS -->
             <div class="mt-actions">
-                <a href="index.html" class="mt-btn mt-btn--cancel">✕ Cancel</a>
+                <a href="tasks.php" class="mt-btn mt-btn--cancel">✕ Cancel</a>
                 <button type="button" class="mt-btn mt-btn--save" id="mt-save-btn">
                     <span class="mt-btn-text">Save</span>
                     <span class="mt-btn-icon">→</span>
