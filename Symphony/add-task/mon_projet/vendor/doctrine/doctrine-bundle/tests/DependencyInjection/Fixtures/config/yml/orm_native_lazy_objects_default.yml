@@ -1,0 +1,9 @@
+doctrine:
+    dbal:
+        default_connection: default
+        connections:
+            default:
+                dbname: db
+                server_version: 9.4.0
+
+    orm: ~

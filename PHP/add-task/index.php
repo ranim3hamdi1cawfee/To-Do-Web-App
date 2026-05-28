@@ -1,4 +1,18 @@
-<?php session_start(); ?>
+<?php
+session_start();
+
+// Redirection si non connecté
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../login_logic/login.php");
+    exit();
+}
+
+// On récupère l'utilisateur courant pour l'utiliser éventuellement dans le JS
+$currentUser = [
+    'username' => $_SESSION['username'],
+    'role'     => $_SESSION['role']
+];
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,12 +24,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Styles supplémentaires pour la vue liste */
         header {
-            /* replace position:sticky and top:0 with this */
             position: sticky;
-            top: var(--navbar-height, 60px); /* change 60px to match your navbar's actual height */
-            z-index: 99; /* one less than navbar so it sits under it */
+            top: var(--navbar-height, 60px);
+            z-index: 99;
         }
         nav {
             position: sticky;
@@ -27,85 +39,7 @@
             flex-direction: column;
             gap: 0.75rem;
         }
-        .list-card {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1rem;
-            transition: all var(--transition);
-        }
-        .list-card:hover {
-            border-color: var(--muted);
-            transform: translateX(4px);
-        }
-        .list-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 1rem;
-            margin-bottom: 0.5rem;
-        }
-        .list-title {
-            font-family: var(--font-head);
-            font-weight: 600;
-            font-size: 1rem;
-        }
-        .list-actions {
-            display: flex;
-            gap: 0.4rem;
-        }
-        .list-desc {
-            font-size: 0.8rem;
-            color: var(--muted);
-            margin-bottom: 0.5rem;
-        }
-        .list-meta {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.7rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .badge {
-            padding: 0.2rem 0.6rem;
-            border-radius: 99px;
-            background: rgba(255,255,255,0.05);
-        }
-        .badge-low { color: var(--low); border-left: 2px solid var(--low); }
-        .badge-medium { color: var(--medium); border-left: 2px solid var(--medium); }
-        .badge-high { color: var(--high); border-left: 2px solid var(--high); }
-        .status-badge {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 0.2rem 0.7rem;
-            font-size: 0.7rem;
-        }
-        .btn-sm {
-            background: none;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 0.2rem 0.6rem;
-            font-family: var(--font-mono);
-            cursor: pointer;
-            color: var(--muted);
-            transition: all var(--transition);
-        }
-        .btn-sm:hover {
-            border-color: var(--text);
-            color: var(--text);
-        }
-        .btn-danger:hover {
-            border-color: var(--high);
-            color: var(--high);
-        }
-        .empty-list {
-            text-align: center;
-            color: var(--muted);
-            padding: 3rem;
-            border: 2px dashed var(--border);
-            border-radius: var(--radius);
-        }
+        /* ... le reste de votre CSS ... */
     </style>
     <link rel="stylesheet" href="../../css/style.css">
 </head>
@@ -126,71 +60,54 @@
     </header>
 
     <main>
-        <!-- Panneau de création (inchangé) -->
         <aside class="panel panel--create">
             <div class="panel-header">
                 <h2>New Task</h2>
                 <span class="panel-tag">+CREATE</span>
             </div>
-
+            <!-- Formulaire de création (inchangé) -->
             <div class="form-group">
                 <label for="task-title">Task Title</label>
                 <input type="text" id="task-title" placeholder="What needs to be done?" autocomplete="off">
             </div>
-
             <div class="form-group">
                 <label for="task-desc">Details</label>
                 <textarea id="task-desc" placeholder="Describe the task..." rows="4"></textarea>
             </div>
-
             <div class="form-group">
                 <label>Priority Level</label>
                 <div class="priority-grid">
                     <label class="priority-option priority-option--low">
                         <input type="radio" name="priority" value="low">
-                        <span class="priority-card">
-                            <span class="priority-icon">▽</span>
-                            <span>Low</span>
-                        </span>
+                        <span class="priority-card"><span class="priority-icon">▽</span><span>Low</span></span>
                     </label>
                     <label class="priority-option priority-option--med">
                         <input type="radio" name="priority" value="medium" checked>
-                        <span class="priority-card">
-                            <span class="priority-icon">◇</span>
-                            <span>Medium</span>
-                        </span>
+                        <span class="priority-card"><span class="priority-icon">◇</span><span>Medium</span></span>
                     </label>
                     <label class="priority-option priority-option--high">
                         <input type="radio" name="priority" value="high">
-                        <span class="priority-card">
-                            <span class="priority-icon">△</span>
-                            <span>High</span>
-                        </span>
+                        <span class="priority-card"><span class="priority-icon">△</span><span>High</span></span>
                     </label>
                 </div>
             </div>
-
             <div class="form-group">
                 <label for="task-due">Due Date</label>
                 <input type="date" id="task-due">
             </div>
-
             <button class="btn-add" id="btn-add">
                 <span class="btn-text">Add Task</span>
                 <span class="btn-icon">→</span>
             </button>
-
             <div class="form-feedback" id="form-feedback"></div>
         </aside>
 
-        <!-- Nouvelle vue liste à la place du Kanban -->
         <section class="panel panel--list">
             <div class="panel-header">
                 <h2>All Tasks</h2>
                 <span class="panel-tag">LIST</span>
             </div>
             <div id="task-list-container" class="task-list">
-                <!-- Les tâches seront injectées ici -->
                 <div class="empty-list">No tasks yet. Create one →</div>
             </div>
         </section>
@@ -198,6 +115,10 @@
 
     <div class="toast-container" id="toast-container"></div>
 
+    <!-- On passe l'utilisateur courant au JS via data ou variable globale -->
+    <script>
+        window.currentUser = <?php echo json_encode($currentUser); ?>;
+    </script>
     <script src="index.js"></script>
 </body>
 </html>

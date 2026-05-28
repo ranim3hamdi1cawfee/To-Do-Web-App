@@ -1,0 +1,10 @@
+/stubs export-ignore
+/tests export-ignore
+/.github export-ignore
+.doctrine-project.json export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
+.scrutinizer.yml export-ignore
+phpunit.xml.dist export-ignore
+/phpcs.xml.dist export-ignore
+/phpstan.neon.dist export-ignore

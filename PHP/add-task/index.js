@@ -1,12 +1,11 @@
-/* ===== TASKFLOW — index.js ===== */
+/* ===== TASKFLOW — index.js  ===== */
 
 const API        = 'api.php';
-const LOGIN_URL  = 'login.php';
-const LOGOUT_URL = 'logout.php';
+const LOGOUT_URL = '../login_logic/logout.php'; 
 
 let tasks       = [];
-let currentUser = null;
-let filterPriority = 'all'; // 'all' | 'low' | 'medium' | 'high'
+let currentUser = window.currentUser || null;
+let filterPriority = 'all';
 
 // DOM refs
 const toastCont     = document.getElementById('toast-container');
@@ -25,109 +24,46 @@ const statusLabels = { todo: 'To Do', doing: 'In Progress', done: 'Done' };
 function isAdmin() { return currentUser && currentUser.role === 'Admin'; }
 
 // ─────────────────────────────────────────────────────────────
-//  LOGIN SCREEN
+//  API (identique)
 // ─────────────────────────────────────────────────────────────
-function showLoginScreen() {
-    document.querySelector('main').style.display   = 'none';
-    document.querySelector('header').style.display = 'none';
-    if (document.getElementById('login-screen')) return;
-    const screen = document.createElement('div');
-    screen.id = 'login-screen';
-    screen.innerHTML = `
-        <div class="login-box">
-            <div class="login-logo">TF</div>
-            <h1 class="login-title">TaskFlow</h1>
-            <p class="login-sub">Connecte-toi pour continuer</p>
-            <div class="login-field"><label>Nom d'utilisateur</label><input id="l-user" type="text" placeholder="username" autocomplete="username"></div>
-            <div class="login-field"><label>Mot de passe</label><input id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
-            <div id="l-error" class="login-error"></div>
-            <button id="l-btn">Connexion →</button>
-        </div>`;
-    const style = document.createElement('style');
-    style.textContent = `
-        #login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:500;font-family:var(--font-mono);}
-        .login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:360px;display:flex;flex-direction:column;gap:1.1rem;box-shadow:0 24px 64px rgba(0,0,0,0.6);animation:fadeUp .4s ease both;}
-        .login-logo{width:48px;height:48px;background:var(--accent);color:#000;font-family:var(--font-head);font-weight:800;font-size:15px;display:grid;place-items:center;border-radius:10px;}
-        .login-title{font-family:var(--font-head);font-weight:800;font-size:1.6rem;letter-spacing:-1px;color:var(--text);}
-        .login-sub{font-size:13px;color:var(--muted);margin-top:-.5rem;}
-        .login-field{display:flex;flex-direction:column;gap:.4rem;}
-        .login-field label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);}
-        .login-field input{background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-mono);font-size:13px;padding:.7rem .9rem;outline:none;}
-        .login-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,251,75,.1);}
-        .login-error{font-size:12px;color:var(--high);min-height:16px;text-align:center;}
-        #l-btn{background:var(--accent);color:#000;border:none;border-radius:10px;font-family:var(--font-head);font-weight:700;padding:.85rem;cursor:pointer;transition:.2s;}
-        #l-btn:hover{background:#d4ff5a;transform:translateY(-2px);}
-        #l-btn:disabled{opacity:.5;cursor:not-allowed;}
-    `;
-    document.head.appendChild(style);
-    document.body.appendChild(screen);
-    document.getElementById('l-btn').addEventListener('click', doLogin);
-    document.getElementById('l-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-    document.getElementById('l-user').focus();
+async function apiFetch(method, params = '', body = null) {
+    const url  = API + (params ? '?' + params : '');
+    const opts = { method, credentials:'include', headers:{'Content-Type':'application/json'} };
+    if (body) opts.body = JSON.stringify(body);
+    const res  = await fetch(url, opts);
+    const data = await res.json();
+    if (res.status === 401) {
+        // Session expirée → redirection vers login
+        window.location.href = '../login_logic/login.php';
+        throw new Error('Session expirée.');
+    }
+    if (!res.ok) throw new Error(data.error ?? 'Erreur serveur');
+    return data;
 }
 
-function hideLoginScreen() {
-    const screen = document.getElementById('login-screen');
-    if (screen) screen.remove();
-    document.querySelector('main').style.display   = '';
-    document.querySelector('header').style.display = '';
-}
+const apiGet    = () => apiFetch('GET');
+const apiPost   = body => apiFetch('POST', '', body);
+const apiPut    = (id, body) => apiFetch('PUT', 'id=' + id, body);
+const apiDelete = id => apiFetch('DELETE', 'id=' + id);
 
-async function doLogin() {
-    const username = document.getElementById('l-user').value.trim();
-    const password = document.getElementById('l-pass').value;
-    const errEl    = document.getElementById('l-error');
-    const btn      = document.getElementById('l-btn');
-    errEl.textContent = '';
-    if (!username || !password) { errEl.textContent = 'Remplis les deux champs.'; return; }
-    btn.disabled = true; btn.textContent = 'Connexion…';
+// ─────────────────────────────────────────────────────────────
+//  Chargement & rendu
+// ─────────────────────────────────────────────────────────────
+async function loadTasks() {
     try {
-        const res  = await fetch(LOGIN_URL, { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ username, password }) });
-        const data = await res.json();
-        if (data.success) {
-            currentUser = { username: data.username, role: data.role };
-            hideLoginScreen();
-            addLogoutButton();
-            await loadTasks();
-            toast(`Bienvenue, ${data.username} !`, 'success');
-        } else {
-            errEl.textContent = data.error ?? 'Identifiants incorrects.';
-            btn.disabled = false; btn.textContent = 'Connexion →';
-        }
-    } catch {
-        errEl.textContent = 'Impossible de joindre le serveur.';
-        btn.disabled = false; btn.textContent = 'Connexion →';
+        const data = await apiGet();
+        tasks = data.tasks ?? [];
+        addFilterBar();
+        renderList();
+    } catch (err) {
+        toast('Erreur chargement : ' + err.message, 'error');
     }
 }
 
-function addLogoutButton() {
-    const headerRight = document.querySelector('.header-right');
-    if (!headerRight || document.getElementById('btn-logout')) return;
-    const btn = document.createElement('button');
-    btn.id = 'btn-logout';
-    btn.textContent = 'Déconnexion';
-    btn.style.cssText = 'background:none;border:1px solid var(--border);border-radius:99px;padding:0.3rem 0.85rem;color:var(--muted);font-family:var(--font-mono);font-size:11px;cursor:pointer;transition:0.2s;';
-    btn.addEventListener('mouseenter', () => { btn.style.borderColor = 'var(--text)'; btn.style.color = 'var(--text)'; });
-    btn.addEventListener('mouseleave', () => { btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--muted)'; });
-    btn.addEventListener('click', async () => {
-        await fetch(LOGOUT_URL, { credentials: 'include' });
-        currentUser = null; tasks = [];
-        btn.remove();
-        const filterBar = document.getElementById('filter-bar');
-        if (filterBar) filterBar.remove();
-        showLoginScreen();
-    });
-    headerRight.appendChild(btn);
-}
-
-// ─────────────────────────────────────────────────────────────
-//  FILTER BAR
-// ─────────────────────────────────────────────────────────────
 function addFilterBar() {
     if (document.getElementById('filter-bar')) return;
     const panel = document.querySelector('.panel--list');
     const header = panel.querySelector('.panel-header');
-
     const bar = document.createElement('div');
     bar.id = 'filter-bar';
     bar.style.cssText = 'display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;';
@@ -137,7 +73,6 @@ function addFilterBar() {
         <button class="filter-btn filter-medium" data-val="medium">◇ Medium</button>
         <button class="filter-btn filter-high"   data-val="high">△ High</button>
     `;
-
     const style = document.createElement('style');
     style.textContent = `
         .filter-btn{background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:0.25rem 0.75rem;font-family:var(--font-mono);font-size:11px;cursor:pointer;color:var(--muted);transition:all 0.2s;letter-spacing:0.5px;}
@@ -160,49 +95,14 @@ function addFilterBar() {
     });
 }
 
-// ─────────────────────────────────────────────────────────────
-//  API
-// ─────────────────────────────────────────────────────────────
-async function apiFetch(method, params = '', body = null) {
-    const url  = API + (params ? '?' + params : '');
-    const opts = { method, credentials:'include', headers:{'Content-Type':'application/json'} };
-    if (body) opts.body = JSON.stringify(body);
-    const res  = await fetch(url, opts);
-    const data = await res.json();
-    if (res.status === 401) { showLoginScreen(); throw new Error('Session expirée.'); }
-    if (!res.ok) throw new Error(data.error ?? 'Erreur serveur');
-    return data;
-}
-
-const apiGet    = () => apiFetch('GET');
-const apiPost   = body => apiFetch('POST', '', body);
-const apiPut    = (id, body) => apiFetch('PUT', 'id=' + id, body);
-const apiDelete = id => apiFetch('DELETE', 'id=' + id);
-
-async function loadTasks() {
-    try {
-        const data = await apiGet();
-        tasks = data.tasks ?? [];
-        addFilterBar();
-        renderList();
-    } catch (err) { toast('Erreur chargement : ' + err.message, 'error'); }
-}
-
-// ─────────────────────────────────────────────────────────────
-//  RENDER — avec colonnes par statut + compteurs
-// ─────────────────────────────────────────────────────────────
 function renderList() {
     if (!listContainer) return;
-
     const filtered = filterPriority === 'all' ? tasks : tasks.filter(t => t.priority === filterPriority);
-
     if (filtered.length === 0) {
         listContainer.innerHTML = '<div class="empty-list">No tasks found.</div>';
     } else {
-        // Grouper par statut
         const groups = { todo: [], doing: [], done: [] };
         filtered.forEach(t => { if (groups[t.status]) groups[t.status].push(t); else groups['todo'].push(t); });
-
         listContainer.innerHTML = statusOrder.map(status => {
             const count = groups[status].length;
             return `
@@ -219,7 +119,6 @@ function renderList() {
                     </div>
                 </div>`;
         }).join('');
-
         // Attach events
         filtered.forEach(task => {
             const cardDiv = document.querySelector(`.list-card[data-id="${task.id}"]`);
@@ -231,22 +130,16 @@ function renderList() {
             if (rewindBtn)  rewindBtn.addEventListener('click',  () => changeStatus(task.id, 'rewind'));
             if (deleteBtn)  deleteBtn.addEventListener('click',  () => deleteTask(task.id));
         });
-
-        // Drag & drop (admin only)
         if (isAdmin()) initDragDrop();
     }
-
     const active = tasks.filter(t => t.status !== 'done').length;
     const urgent = tasks.filter(t => t.priority === 'high' && t.status !== 'done').length;
     activeCount.textContent = active;
     urgentCount.textContent = urgent;
 }
 
-// ─────────────────────────────────────────────────────────────
-//  DRAG & DROP
-// ─────────────────────────────────────────────────────────────
+// Drag & drop (identique)
 let draggedId = null;
-
 function initDragDrop() {
     document.querySelectorAll('.list-card').forEach(card => {
         card.setAttribute('draggable', 'true');
@@ -260,7 +153,6 @@ function initDragDrop() {
             document.querySelectorAll('.status-group-body').forEach(z => z.classList.remove('drag-over'));
         });
     });
-
     document.querySelectorAll('.status-group-body').forEach(zone => {
         zone.addEventListener('dragover', e => {
             e.preventDefault();
@@ -284,16 +176,12 @@ function initDragDrop() {
     });
 }
 
-// ─────────────────────────────────────────────────────────────
-//  BUILD CARD
-// ─────────────────────────────────────────────────────────────
 function buildListItem(task) {
     const idx        = statusOrder.indexOf(task.status);
     const canAdvance = idx < statusOrder.length - 1;
     const canRewind  = idx > 0;
     const due        = task.due_date ?? '';
     const overdue    = due && new Date(due) < new Date(new Date().toDateString()) && task.status !== 'done';
-
     return `
         <div class="list-card priority-border-${task.priority}" data-id="${task.id}" data-priority="${task.priority}">
             <div class="list-header">
@@ -318,14 +206,10 @@ function formatDate(iso) {
     const [y, m, d] = iso.split('-');
     return `${d}/${m}/${y}`;
 }
-
 function escHtml(str = '') {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ─────────────────────────────────────────────────────────────
-//  ACTIONS
-// ─────────────────────────────────────────────────────────────
 async function changeStatus(taskId, direction) {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
@@ -353,9 +237,7 @@ async function deleteTask(taskId) {
     } catch (err) { toast(err.message, 'error'); }
 }
 
-// ─────────────────────────────────────────────────────────────
-//  CRÉATION
-// ─────────────────────────────────────────────────────────────
+// Création
 btnAdd.addEventListener('click', async () => {
     const title = inputTitle.value.trim();
     if (!title) { feedback.textContent = 'Le titre est obligatoire.'; inputTitle.focus(); return; }
@@ -371,12 +253,9 @@ btnAdd.addEventListener('click', async () => {
         inputTitle.focus();
     } catch (err) { feedback.textContent = err.message; toast(err.message, 'error'); }
 });
-
 inputTitle.addEventListener('keydown', e => { if (e.key === 'Enter') btnAdd.click(); });
 
-// ─────────────────────────────────────────────────────────────
-//  TOAST
-// ─────────────────────────────────────────────────────────────
+// Toast
 function toast(msg, type = 'success') {
     const el = document.createElement('div');
     el.className = `toast toast--${type}`;
@@ -386,23 +265,26 @@ function toast(msg, type = 'success') {
     setTimeout(() => { el.classList.add('hiding'); el.addEventListener('animationend', () => el.remove()); }, 3000);
 }
 
-// ─────────────────────────────────────────────────────────────
-//  INIT
-// ─────────────────────────────────────────────────────────────
-async function init() {
-    try {
-        const res  = await fetch('check_session.php', { credentials: 'include' });
-        const data = await res.json();
-        if (data.logged_in) {
-            currentUser = { username: data.username, role: data.role };
-            addLogoutButton();
-            await loadTasks();
-        } else {
-            showLoginScreen();
-        }
-    } catch {
-        showLoginScreen();
-    }
+// Déconnexion (bouton)
+function addLogoutButton() {
+    const headerRight = document.querySelector('.header-right');
+    if (!headerRight || document.getElementById('btn-logout')) return;
+    const btn = document.createElement('button');
+    btn.id = 'btn-logout';
+    btn.textContent = 'Déconnexion';
+    btn.style.cssText = 'background:none;border:1px solid var(--border);border-radius:99px;padding:0.3rem 0.85rem;color:var(--muted);font-family:var(--font-mono);font-size:11px;cursor:pointer;transition:0.2s;';
+    btn.addEventListener('mouseenter', () => { btn.style.borderColor = 'var(--text)'; btn.style.color = 'var(--text)'; });
+    btn.addEventListener('mouseleave', () => { btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--muted)'; });
+    btn.addEventListener('click', async () => {
+        await fetch(LOGOUT_URL, { credentials: 'include' });
+        window.location.href = '../login_logic/login.php';
+    });
+    headerRight.appendChild(btn);
 }
 
+// Initialisation
+async function init() {
+    addLogoutButton();
+    await loadTasks();
+}
 init();

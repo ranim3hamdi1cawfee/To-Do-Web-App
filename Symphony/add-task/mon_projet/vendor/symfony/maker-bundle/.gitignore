@@ -1,0 +1,11 @@
+/.php-cs-fixer.cache
+/.phpunit.cache
+/composer.lock
+/fake
+/phpunit.xml
+/tests/tmp/*
+/tools/*/composer.lock
+/tools/*/vendor
+/vendor/
+/_docs_build/vendor
+/_docs_build/output
