@@ -6,7 +6,7 @@
 
 session_start();
 
-require_once '../login_logic/db.php';
+require_once '../add-task/db.php';
 require_once '../login_logic/auth_guard.php';
 
 // Vérifier que l'utilisateur est connecté
@@ -80,8 +80,8 @@ $disabled = $isAdmin ? '' : 'disabled';
         <span class="mt-user-badge">
             <?php echo $isAdmin ? 'Admin' : 'User'; ?> — <?php echo htmlspecialchars($username); ?>
         </span>
-        <a href="index.html" class="mt-back-btn">← Back</a>
-        <a href="logout.php" class="mt-back-btn" style="border-color:#ff5f5f; color:#ff5f5f;">Logout</a>
+        <a href="../add-task/index.php" class="mt-back-btn">← Back</a>
+        <a href="../login_logic/logout.php" class="mt-back-btn" style="border-color:#ff5f5f; color:#ff5f5f;">Logout</a>
     </div>
 </header>
 
@@ -166,7 +166,7 @@ $disabled = $isAdmin ? '' : 'disabled';
 
             <!-- BOUTONS -->
             <div class="mt-actions">
-                <a href="tasks.php" class="mt-btn mt-btn--cancel">✕ Cancel</a>
+                <a href="../add-task/index.php" class="mt-btn mt-btn--cancel">✕ Cancel</a>
                 <button type="button" class="mt-btn mt-btn--save" id="mt-save-btn">
                     <span class="mt-btn-text">Save</span>
                     <span class="mt-btn-icon">→</span>
