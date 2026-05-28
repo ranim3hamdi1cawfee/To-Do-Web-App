@@ -45,7 +45,7 @@ function getTachesParPeriode(periode) {
     // Sauvegarder la version normalisée pour l'affichage des graphiques
     tache.date = tAnnee + "-" + String(tMois + 1).padStart(2, '0') + "-" + String(tJour).padStart(2, '0');
 
-    // 1. Filtrage : Aujourd'hui
+    // filtrage : today
     if (periode === "today") {
       return tAnnee === aujAnnee && tMois === aujMois && tJour === aujJour;
     }
@@ -109,7 +109,7 @@ function dessinerGraphique(taches) {
   var groupes = [];
 
   if (periodeActive === "today") {
-    titrGraph.textContent = "Tasks per hour — Today";
+    titrGraph.textContent = "Tasks due today";
     conteneur.className   = "graphique mode-semaine";
     ["Todo\n", "Doing\n", "Done\n"].forEach(function(l) {
       groupes.push({ label: l, faites: 0, reste: 0 });
