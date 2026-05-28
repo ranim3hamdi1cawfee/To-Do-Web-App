@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome | TaskFlow</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+</head>
+<body>
+    {% include 'partials/navbar.html.twig' %}
+
+    <main class="dash-container">
+        <div class="avatar-section">
+            <div class="avatar-main avatar-initial">
+                {{ user.username|slice(0,1)|upper }}
+            </div>
+        </div>
+
+        <header style="text-align: center;">
+            <span style="color: var(--muted); font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;">
+                {{ greeting }},
+            </span>
+            <h1 style="font-family: 'Rajdhani', sans-serif; font-size: 3rem; color: #fff; font-weight: bold; margin: 0;">
+                {{ user.username }}
+            </h1>
+            {% if user.motto %}
+                <p style="color: var(--muted); font-style: italic; margin-top: 5px;">"{{ user.motto }}"</p>
+            {% endif %}
+        </header>
+
+        <div class="divider"></div>
+
+        <div style="margin-top: 10px; width: 100%; max-width: 220px;">
+            <a href="#" class="cta">Resume Tasks →</a>
+        </div>
+    </main>
+
+    <footer>
+        <p class="footer_txt">&copy; 2026 Advanced Todo Webapp</p>
+    </footer>
+</body>
+</html>

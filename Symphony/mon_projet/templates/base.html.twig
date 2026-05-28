@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}TaskFlow{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; } [cite: 1, 2]
+
+        body {
+            font-family: 'Courier New', monospace; [cite: 2]
+            background: #0a0a0a; [cite: 3]
+            color: #ccc; [cite: 3]
+            min-height: 100vh; [cite: 3]
+        }
+
+        /* LAYOUT CONTAINER */
+        .layout {
+            display: grid; [cite: 3]
+            grid-template-columns: 400px 1fr; /* Sidebar, Main Content */ 
+            min-height: calc(100vh - 70px); 
+        }
+
+        /* SIDEBAR styles */
+        .sidebar { border-right: 1px solid #1e1e1e; padding: 28px; } [cite: 4, 5]
+        .sidebar-title {
+            font-size: 18px; [cite: 5]
+            font-weight: 700; color: #fff; [cite: 6]
+            margin-bottom: 24px; [cite: 6]
+            display: flex; justify-content: space-between; align-items: center; [cite: 6]
+        }
+        .btn-create {
+            background: #1a1a1a; [cite: 7]
+            border: 1px solid #333; color: #aaa; [cite: 8]
+            padding: 6px 14px; border-radius: 6px; font-size: 12px; [cite: 8]
+            font-family: 'Courier New', monospace; cursor: pointer; [cite: 8]
+            letter-spacing: 1px; [cite: 9]
+        }
+        .btn-create:hover { border-color: #c8ff00; color: #c8ff00; } [cite: 10]
+
+        /* FORM fields */
+        .field { margin-bottom: 20px; } [cite: 10, 11]
+        .field label {
+            display: block; [cite: 11]
+            font-size: 11px; font-weight: 700; [cite: 12]
+            letter-spacing: 1.5px; color: #555; margin-bottom: 8px; text-transform: uppercase; [cite: 12]
+        }
+        .field input, .field select {
+            width: 100%; [cite: 13]
+            background: #111; border: 1px solid #222; [cite: 14]
+            border-radius: 8px; padding: 12px 14px; color: #ccc; [cite: 14]
+            font-family: 'Courier New', monospace; font-size: 13px; [cite: 14]
+            transition: border-color 0.2s; [cite: 15]
+        }
+        .field input::placeholder { color: #444; } [cite: 15, 16]
+        .field input:focus, .field select:focus { outline: none; border-color: #c8ff00; } [cite: 16, 17]
+        .field select option { background: #111; } [cite: 17, 18]
+
+        /* PRIORITIES */
+        .priority-group { display: flex; gap: 10px; } [cite: 18, 19]
+        .priority-btn {
+            flex: 1; [cite: 19]
+            background: #111; border: 1px solid #222; border-radius: 8px; [cite: 20]
+            padding: 14px 10px; color: #555; font-family: 'Courier New', monospace; [cite: 20]
+            font-size: 11px; [cite: 20]
+            font-weight: 700; letter-spacing: 1px; cursor: pointer; [cite: 21]
+            text-align: center; transition: all 0.2s; [cite: 21]
+        }
+        .priority-btn:hover { border-color: #c8ff00; color: #c8ff00; } [cite: 22]
+        .priority-btn .icon { font-size: 16px; display: block; margin-bottom: 6px; } [cite: 23]
+
+        .btn-submit {
+            width: 100%; [cite: 24]
+            background: #c8ff00; color: #000; border: none; [cite: 25]
+            border-radius: 8px; padding: 14px; font-family: 'Courier New', monospace; [cite: 25]
+            font-size: 13px; font-weight: 900; letter-spacing: 2px; [cite: 25]
+            cursor: pointer; margin-top: 8px; transition: background 0.2s; [cite: 26]
+        }
+        .btn-submit:hover { background: #b8ef00; } [cite: 26, 27]
+
+        /* MAIN APP STYLES */
+        .main { padding: 28px 32px; } [cite: 27, 28]
+        .main-header {
+            display: flex; [cite: 28]
+            justify-content: space-between; [cite: 29]
+            align-items: center; margin-bottom: 24px; [cite: 29]
+        }
+        .main-title { font-size: 18px; font-weight: 700; color: #fff; } [cite: 29, 30]
+
+        /* TASK RENDER styles */
+        .task-list { list-style: none; display: flex; flex-direction: column; gap: 10px; } [cite: 30, 31]
+        .task-item {
+            background: #111; [cite: 31]
+            border: 1px solid #1e1e1e; border-radius: 10px; [cite: 32]
+            padding: 16px 20px; display: flex; justify-content: space-between; [cite: 32]
+            align-items: center; transition: border-color 0.2s; [cite: 32]
+        }
+        .task-item:hover { border-color: #333; } [cite: 33, 34]
+        .task-item.ff { border-left: 3px solid #ff4444; } [cite: 34, 35]
+        .task-item.f  { border-left: 3px solid #f97316; } [cite: 35, 36]
+        .task-item.mf { border-left: 3px solid #c8ff00; } [cite: 36, 37]
+        .task-item.p  { border-left: 3px solid #34d399; } [cite: 37, 38]
+        .task-item.pp { border-left: 3px solid #60a5fa; } [cite: 38, 39]
+
+        .task-name { font-size: 14px; font-weight: 600; color: #e0e0e0; margin-bottom: 6px; } [cite: 39, 40]
+        .task-meta { display: flex; gap: 8px; flex-wrap: wrap; } [cite: 40, 41]
+
+        .pill {
+            padding: 3px 10px; [cite: 41, 42]
+            border-radius: 20px; font-size: 11px; [cite: 42]
+            font-weight: 700; letter-spacing: .5px; border: 1px solid #333; color: #777; [cite: 42, 43]
+        }
+        .pill-green { border-color: #c8ff0044; color: #c8ff00; background: #c8ff0011; } [cite: 43, 44]
+        .pill-red   { border-color: #ff444444; color: #ff6666; background: #ff444411; } [cite: 44, 45]
+
+        .tag {
+            background: #1a1500; [cite: 45, 46]
+            border: 1px solid #3a2f00; [cite: 46]
+            color: #c8a800; padding: 2px 8px; border-radius: 4px; font-size: 11px; [cite: 46, 47]
+        }
+
+        .btn-delete {
+            background: none; [cite: 47, 48]
+            border: 1px solid #2a2a2a; color: #555; [cite: 48]
+            padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; [cite: 48]
+            text-decoration: none; [cite: 48, 49]
+            font-family: 'Courier New', monospace; [cite: 49]
+            transition: all 0.2s; white-space: nowrap; [cite: 49]
+        }
+        .btn-delete:hover { border-color: #ff4444; color: #ff4444; } [cite: 49, 50]
+
+        .empty {
+            border: 1.5px dashed #1e1e1e; [cite: 50, 51]
+            border-radius: 10px; [cite: 51]
+            padding: 80px 20px; text-align: center; color: #333; font-size: 14px; [cite: 51, 52]
+        }
+
+        .flash {
+            background: #0d1f00; [cite: 52, 53]
+            border: 1px solid #c8ff0033; color: #c8ff00; [cite: 53]
+            padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; [cite: 53, 54]
+        }
+    </style>
+    {% block stylesheets %}{% endblock %} 
+</head>
+<body>
+
+    {% include 'partials/navbar.html.twig' %} 
+
+    {% block body %}{% endblock %} 
+
+    {% block javascripts %}{% endblock %} 
+</body>
+</html>
