@@ -264,27 +264,8 @@ function toast(msg, type = 'success') {
     toastCont.appendChild(el);
     setTimeout(() => { el.classList.add('hiding'); el.addEventListener('animationend', () => el.remove()); }, 3000);
 }
-
-// Déconnexion (bouton)
-function addLogoutButton() {
-    const headerRight = document.querySelector('.header-right');
-    if (!headerRight || document.getElementById('btn-logout')) return;
-    const btn = document.createElement('button');
-    btn.id = 'btn-logout';
-    btn.textContent = 'Déconnexion';
-    btn.style.cssText = 'background:none;border:1px solid var(--border);border-radius:99px;padding:0.3rem 0.85rem;color:var(--muted);font-family:var(--font-mono);font-size:11px;cursor:pointer;transition:0.2s;';
-    btn.addEventListener('mouseenter', () => { btn.style.borderColor = 'var(--text)'; btn.style.color = 'var(--text)'; });
-    btn.addEventListener('mouseleave', () => { btn.style.borderColor = 'var(--border)'; btn.style.color = 'var(--muted)'; });
-    btn.addEventListener('click', async () => {
-        await fetch(LOGOUT_URL, { credentials: 'include' });
-        window.location.href = '../login_logic/login.php';
-    });
-    headerRight.appendChild(btn);
-}
-
 // Initialisation
 async function init() {
-    addLogoutButton();
     await loadTasks();
 }
 init();
