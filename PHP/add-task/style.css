@@ -1,3 +1,8 @@
+/* ============================================================
+   TASKFLOW - ADD TASK MODULE
+   Style harmonisé avec Statistics
+   ============================================================ */
+
 /* ---------- RESET & BASE ---------- */
 *, *::before, *::after {
     box-sizing: border-box;
@@ -47,11 +52,11 @@ body {
     background-size: 200px;
 }
 
-/* ---------- HEADER (stats) ---------- */
+/* ---------- HEADER ---------- */
 header {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;  /* ← changement clé */
     padding: 1.25rem 2rem;
     border-bottom: 1px solid var(--border);
     background: rgba(13,13,15,0.9);
@@ -59,6 +64,24 @@ header {
     position: sticky;
     top: 60px;
     z-index: 99;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.page-title {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.2px;
+    color: var(--accent);
+    background: rgba(200, 251, 75, 0.1);
+    padding: 0.3rem 0.9rem;
+    border-radius: 99px;
+    border: 1px solid rgba(200, 251, 75, 0.3);
 }
 
 .header-right {
@@ -79,21 +102,18 @@ header {
 .stat-pill:hover {
     border-color: var(--accent);
 }
-
 .stat-pill--accent {
     border-color: var(--high);
 }
 .stat-pill--accent .stat-num {
     color: var(--high);
 }
-
 .stat-num {
     font-family: var(--font-head);
     font-weight: 700;
     font-size: 1.1rem;
     color: var(--accent);
 }
-
 .stat-label {
     font-size: 11px;
     color: var(--muted);
@@ -126,14 +146,12 @@ main {
     justify-content: space-between;
     margin-bottom: 0.25rem;
 }
-
 .panel-header h2 {
     font-family: var(--font-head);
     font-weight: 700;
     font-size: 1.15rem;
     letter-spacing: -0.3px;
 }
-
 .panel-tag {
     font-size: 10px;
     letter-spacing: 2px;
@@ -150,7 +168,6 @@ main {
     flex-direction: column;
     gap: 0.5rem;
 }
-
 .form-group label {
     font-size: 11px;
     letter-spacing: 1.5px;
@@ -171,7 +188,6 @@ input, textarea, select {
     transition: all var(--transition);
     width: 100%;
 }
-
 input:focus, textarea:focus, select:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(200, 251, 75, 0.1);
@@ -183,7 +199,6 @@ input:focus, textarea:focus, select:focus {
     grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
 }
-
 .priority-option {
     cursor: pointer;
 }
@@ -223,6 +238,7 @@ input:focus, textarea:focus, select:focus {
     transform: translateY(-2px);
 }
 
+/* Bouton Add Task – juste après le formulaire (plus de margin-top:auto) */
 .btn-add {
     display: flex;
     align-items: center;
@@ -239,13 +255,14 @@ input:focus, textarea:focus, select:focus {
     cursor: pointer;
     transition: all var(--transition);
     width: 100%;
-    margin-top: auto;
+    margin-top: 0.5rem;   /* petite marge au lieu de auto */
 }
 .btn-add:hover {
     background: #d4ff5a;
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(200,251,75,0.3);
 }
+
 .form-feedback {
     font-size: 12px;
     color: var(--high);
@@ -260,7 +277,6 @@ input:focus, textarea:focus, select:focus {
     animation: fadeUp 0.5s ease both;
     animation-delay: 0.1s;
 }
-
 .task-list {
     display: flex;
     flex-direction: column;
@@ -367,7 +383,6 @@ input:focus, textarea:focus, select:focus {
     border-color: var(--high);
     color: var(--high);
 }
-/* MODIFIER : pas de couleur spéciale, reste muted */
 .btn-edit:hover {
     border-color: var(--accent);
     color: var(--accent);
@@ -476,6 +491,7 @@ input:focus, textarea:focus, select:focus {
 .toast--error   { border-left-color: var(--high); }
 .toast--info    { border-left-color: var(--accent3); }
 .toast.hiding { animation: toastOut 0.3s ease forwards; }
+
 @keyframes toastIn {
     from { opacity: 0; transform: translateX(20px); }
     to   { opacity: 1; transform: translateX(0); }

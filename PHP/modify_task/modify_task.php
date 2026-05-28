@@ -6,8 +6,8 @@
 
 session_start();
 
-require_once '../login_logic/db.php';
-require_once '../login_logic/auth_guard.php';
+require_once __DIR__ . '/../add-task/db.php';
+require_once __DIR__ . '/../login_logic/auth_guard.php';
 
 // Vérifier que l'utilisateur est connecté
 requireLogin();
