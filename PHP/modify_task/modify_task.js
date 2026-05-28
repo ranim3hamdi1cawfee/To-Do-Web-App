@@ -76,7 +76,7 @@ function saveTask() {
             showFeedback(result.message, 'success');
 
             setTimeout(function() {
-                window.location.href = 'index.php';
+                window.location.href = '../add-task/index.php';
             }, 1500);
         }
         else {
