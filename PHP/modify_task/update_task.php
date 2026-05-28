@@ -4,10 +4,6 @@ session_start();
 header('Content-Type: application/json');
 
 require_once __DIR__ . '/../add-task/db.php';
-<<<<<<< HEAD
-
-=======
->>>>>>> 09b2efca01419fbceeb3c35cc8aa5015bafe853f
 // Vérifier que l'utilisateur est connecté
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'error' => 'Non connecté.']);
