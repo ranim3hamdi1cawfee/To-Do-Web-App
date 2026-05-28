@@ -16,7 +16,9 @@ if (!isset($_SESSION['user_id'])) {
     <title>Task List</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Mono:wght@300;400;500&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -39,17 +41,43 @@ if (!isset($_SESSION['user_id'])) {
                 <span class="stat-label">Urgent</span>
             </div>
         </div>
+        <div style="margin-bottom:20px;">
+            <select id="group-filter">
+                <option value="">
+                    All Groups
+                </option>
+                <option value="1">
+                    Development Alpha
+                </option>
 
+                <option value="2">
+                    UI/UX Design Team
+                </option>
+
+                <option value="3">
+                    QA Testing Squad
+                </option>
+
+                <option value="4">
+                    Backend Team
+                </option>
+
+                <option value="5">
+                    DevOps
+                </option>
+        </div>
+        </select>
         <table>
             <thead>
                 <tr>
                     <th>Task</th>
                     <th>Description</th>
-                    <th>Start Date</th>
                     <th>Priority</th>
                     <th>Status</th>
                     <th>Deadline</th>
-                    <th>Actions</th>
+                    <?php if ($_SESSION['role'] == "Admin"): ?>
+                        <th>Actions</th>
+                    <?php endif; ?>
                 </tr>
             </thead>
             <tbody id="task-table-body"></tbody>
@@ -59,33 +87,37 @@ if (!isset($_SESSION['user_id'])) {
     <div class="toast-container"></div>
 
     <script>
-        async function loadTasks() {
+        window.loadTasks = async function () {
             try {
-                const response = await fetch("../add-task/api.php", {
-                    credentials: "include"
-                });
+                const group = document.getElementById("group-filter").value;
+                const response = await fetch("../add-task/api.php?group=" + group,
+                    {
+                        credentials: "include"
+                    }
+                );
                 const data = await response.json();
                 const tbody = document.getElementById("task-table-body");
                 tbody.innerHTML = "";
 
                 if (!data.tasks || data.tasks.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color: var(--muted);">No tasks yet.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="<?= $_SESSION['role'] == "Admin" ? 6 : 5 ?>"> style="text-align:center; color: var(--muted);">No tasks yet.</td></tr>`;
                     return;
                 }
 
                 data.tasks.forEach(task => {
                     tbody.innerHTML += `
-                        <tr data-id="${task.id}" class="${task.status === 'done' ? 'completed' : ''}">
+                        <tr data-id="${task.id}" data-status="${task.status}" class="${task.status === 'done' ? 'completed' : ''}">
                             <td>${task.title}</td>
                             <td>${task.description ?? ''}</td>
-                            <td>${task.created_at ?? ''}</td>
                             <td><span class="badge ${task.priority}">${task.priority}</span></td>
                             <td>${task.status}</td>
                             <td>${task.due_date ?? ''}</td>
+                            <?php if ($_SESSION['role'] == "Admin"): ?>
                             <td class="actions">
-                                <button class="done" onclick="markDone('${task.id}')">✔</button>
-                                <button class="delete" onclick="deleteTask('${task.id}')">✕</button>
+                                <button class="done">✔</button>
+                                <button class="delete">✕</button>
                             </td>
+                            <?php endif; ?>
                         </tr>
                     `;
                 });
@@ -105,6 +137,7 @@ if (!isset($_SESSION['user_id'])) {
         }
 
         loadTasks();
+        document.getElementById("group-filter").addEventListener("change", loadTasks);
     </script>
 
     <script src="index.js"></script>

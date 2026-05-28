@@ -35,11 +35,12 @@ function updateStats() {
 }
 
 updateStats();
-const API = "../DATABASE/api.php";
+const API = "../add-task/api.php";
 
 async function apiPut(id, body) {
   const response = await fetch(API + "?id=" + id, {
     method: "PUT",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
@@ -52,6 +53,7 @@ async function apiPut(id, body) {
 async function apiDelete(id) {
   const response = await fetch(API + "?id=" + id, {
     method: "DELETE",
+    credentials: "include",
   });
 
   return await response.json();
@@ -63,7 +65,7 @@ document.addEventListener("click", async (e) => {
 
     const id = row.dataset.id;
 
-    const currentStatus = row.children[4].textContent.trim();
+    const currentStatus = row.dataset.status;
 
     const newStatus = currentStatus == "done" ? "todo" : "done";
 
