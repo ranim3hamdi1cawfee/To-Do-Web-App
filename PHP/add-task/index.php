@@ -7,6 +7,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// On récupère l'utilisateur courant pour l'utiliser éventuellement dans le JS
 $currentUser = [
     'username' => $_SESSION['username'],
     'role'     => $_SESSION['role']
@@ -22,15 +23,30 @@ $currentUser = [
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        header {
+            position: sticky;
+            top: var(--navbar-height, 60px);
+            z-index: 99;
+        }
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        /* ... le reste de votre CSS ... */
+    </style>
     <link rel="stylesheet" href="../../css/style.css">
 </head>
 <body>
-    <?php require_once("../../welcome/navbar.php"); ?>
+    <?php require_once("../welcome/navbar.php"); ?>
     <div class="noise"></div>
     <header>
-        <div class="header-left">
-            <span class="page-title">✎ Formulaire</span>
-        </div>
         <div class="header-right">
             <div class="stat-pill">
                 <span class="stat-num" id="active-count">0</span>
@@ -49,6 +65,7 @@ $currentUser = [
                 <h2>New Task</h2>
                 <span class="panel-tag">+CREATE</span>
             </div>
+            <!-- Formulaire de création (inchangé) -->
             <div class="form-group">
                 <label for="task-title">Task Title</label>
                 <input type="text" id="task-title" placeholder="What needs to be done?" autocomplete="off">
@@ -98,6 +115,7 @@ $currentUser = [
 
     <div class="toast-container" id="toast-container"></div>
 
+    <!-- On passe l'utilisateur courant au JS via data ou variable globale -->
     <script>
         window.currentUser = <?php echo json_encode($currentUser); ?>;
     </script>
