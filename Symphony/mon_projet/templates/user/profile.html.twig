@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile | {{ profileUser.username }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+</head>
+<body class="bg-dark text-white">
+    {% include 'partials/navbar.html.twig' %}
+
+    <div class="adm" style="margin-top: 70px;">
+        <h2 class="text-white mb-4" style="font-size:50px; font-weight: bold; text-align: center;">User Profile</h2>
+
+        <div class="container-box" style="max-width: 500px; margin: 0 auto;">
+
+            <div style="display:flex; justify-content:center; margin-bottom:20px;">
+                {% if profileUser.profileImage and profileUser.profileImage != 'default_avatar.png' %}
+                    <img src="{{ asset('uploads/' ~ profileUser.profileImage) }}"
+                         width="80" height="80"
+                         style="border-radius:50%; object-fit:cover; border:3px solid var(--primary);">
+                {% endif %}
+            </div>
+
+            <div class="decor">
+                <label class="label">User Name</label>
+                <span style="flex:1; padding-left:10px; font-weight:600;">{{ profileUser.username }}</span>
+            </div>
+
+            <div class="decor">
+                <label class="label">Account Role</label>
+                <span style="flex:1; padding-left:10px; color:var(--primary); font-weight:bold;">
+                    🛡️ {{ profileUser.role }}
+                </span>
+            </div>
+
+            <div class="decor">
+                <label class="label">Birthday</label>
+                <span style="flex:1; padding-left:10px;">{{ birthdayFormatted }}</span>
+            </div>
+
+            {% if profileUser.group %}
+            <div class="decor">
+                <label class="label">Work Team</label>
+                <span style="flex:1; padding-left:10px; font-weight:500; color:#38bdf8;">
+                    {{ profileUser.group.name }}
+                </span>
+            </div>
+            {% endif %}
+
+            <div class="decor">
+                <label class="label">Motto</label>
+                <span style="flex:1; padding-left:10px; font-style:italic;">"{{ profileUser.motto }}"</span>
+            </div>
+
+            <div class="decor">
+                <label class="label">Member Since</label>
+                <span style="flex:1; padding-left:10px;">{{ joinedDate }}</span>
+            </div>
+
+            <div class="decor">
+                <label class="label">Current Streak</label>
+                <span style="flex:1; padding-left:10px; font-weight:bold; color:crimson;">
+                    🔥 {{ profileUser.currentStreak }} Days
+                </span>
+            </div>
+
+            <div class="decor" style="justify-content:center; margin-top:20px;">
+                <a href="{{ path('app_welcome') }}" class="btn btn-secondary px-4">Return to Dashboard</a>
+            </div>
+
+            {% if isSameUserOrAdmin %}
+                <div class="decor" style="justify-content:center; margin-top:10px;">
+                    <a href="{{ path('app_user_edit', {id: profileUser.id}) }}" class="btn btn-primary px-4">Edit Profile</a>
+                </div>
+                <div class="decor" style="justify-content:center; margin-top:10px;">
+                    <a href="{{ path('app_user_delete', {id: profileUser.id}) }}"
+                       class="btn btn-danger px-4"
+                       onclick="return confirm('Are you sure you want to permanently delete this account?')">
+                       Delete User Account
+                    </a>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,569 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&display=swap');
+
+/* ==========================================================================
+   1. GLOBAL VARIABLES & DESIGN TOKENS
+   ========================================================================== */
+:root {
+    --primary: #be123c;
+    --primary-hover: #810726;
+    --secondary: #2563eb;
+    --secondary-hover: #1d4ed8;
+    --bg-dark: #001a2c;
+    --card: #111827;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --border: #374151;
+    --radius: 10px;
+    --transition: 0.25s ease;
+}
+
+/* ==========================================================================
+   2. RESET & GLOBAL RESETS
+   ========================================================================== */
+*, *::before, *::after { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
+body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ==========================================================================
+   3. GLOBAL NAVIGATION (navbar.html.twig)
+   ========================================================================== */
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: #020617;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    border-bottom: 1px solid var(--border);
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 30px;
+    font-weight: bold;
+    color: #fdf0d5;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    font-size: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: var(--muted);
+    transition: var(--transition);
+}
+
+nav ul li a:hover {
+    color: var(--text);
+}
+
+/* ==========================================================================
+   4. SYSTEM APP LAYOUT (With Navbar Offset Fixed)
+   ========================================================================== */
+.layout {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    margin-top: 70px; /* Crucial: Prevents the fixed navbar from overlapping content */
+    min-height: calc(100vh - 70px);
+}
+
+/* ==========================================================================
+   5. HEADER SECTION (Legacy layout component)
+   ========================================================================== */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px;
+    border-bottom: 1px solid #1e1e1e;
+}
+.header-left { display: flex; align-items: center; gap: 14px; }
+.logo-box {
+    background: var(--primary);
+    color: #fff;
+    font-weight: 900;
+    font-size: 14px;
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+}
+.logo-title { font-size: 22px; font-weight: 700; color: #fff; }
+.logo-sub { font-size: 12px; color: var(--primary); margin-top: 2px; }
+
+.header-right { display: flex; gap: 12px; }
+.badge-btn {
+    display: flex; align-items: center; gap: 7px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-decoration: none;
+}
+.badge-btn .dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot-green { background: #10b981; }
+.dot-red   { background: #ef4444; }
+
+/* ==========================================================================
+   6. SIDEBAR COMPONENTS
+   ========================================================================== */
+.sidebar {
+    border-right: 1px solid var(--border);
+    padding: 28px;
+    background: #01223a;
+}
+.sidebar-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.btn-create {
+    background: #1a1a1a;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: var(--transition);
+}
+.btn-create:hover { border-color: var(--primary); color: #fff; }
+
+/* ==========================================================================
+   7. UNIFIED FORMS COMPONENTS
+   ========================================================================== */
+.field { margin-bottom: 20px; }
+.field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+.field input, .field select {
+    width: 100%;
+    background: #020617;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    color: var(--text);
+    font-size: 13px;
+    transition: var(--transition);
+}
+.field input::placeholder { color: #444; }
+.field input:focus, .field select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(190, 18, 60, 0.3);
+}
+.field select option { background: #111; }
+
+/* PRIORITY BUTTONS */
+.priority-group { display: flex; gap: 10px; }
+.priority-btn {
+    flex: 1;
+    background: #111;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 10px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+.priority-btn:hover { border-color: var(--primary); color: #fff; }
+.priority-btn .icon { font-size: 16px; display: block; margin-bottom: 6px; }
+
+.btn-submit {
+    width: 100%;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    padding: 14px;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: var(--transition);
+}
+.btn-submit:hover { background: var(--primary-hover); }
+
+/* ==========================================================================
+   8. MAIN CONTENT CONTAINER
+   ========================================================================== */
+.main { padding: 28px 32px; }
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+.main-title { font-size: 18px; font-weight: 700; color: #fff; }
+
+/* ==========================================================================
+   9. TASK ITEM COMPONENT RULES
+   ========================================================================== */
+.task-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.task-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.2s;
+}
+.task-item:hover { border-color: #555; }
+.task-item.ff { border-left: 3px solid #ff4444; }
+.task-item.f  { border-left: 3px solid #f97316; }
+.task-item.mf { border-left: 3px solid #eab308; }
+.task-item.p  { border-left: 3px solid #34d399; }
+.task-item.pp { border-left: 3px solid #60a5fa; }
+
+.task-name { font-size: 14px; font-weight: 600; color: #e0e0e0; margin-bottom: 6px; }
+.task-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.pill {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+}
+.pill-green { border-color: rgba(16, 185, 129, 0.3); color: #10b981; background: rgba(16, 185, 129, 0.1); }
+.pill-red   { border-color: rgba(239, 68, 68, 0.3); color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+
+.tag {
+    background: #1e293b;
+    border: 1px solid var(--border);
+    color: #f59e0b;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+.btn-delete {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.btn-delete:hover { border-color: #ff4444; color: #ff4444; }
+
+.empty {
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    padding: 80px 20px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.flash {
+    background: #1e1b4b;
+    border: 1px solid rgba(190, 18, 60, 0.3);
+    color: #fda4af;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+}
+
+/* ==========================================================================
+   10. MARKETING SECTIONS / LANDING VIEWS
+   ========================================================================== */
+.section1 {
+    margin-top: 70px;
+    position: relative;
+    text-align: center;
+    padding: 80px 20px;
+    flex-grow: 1;
+}
+
+.img_txt {
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--text);
+    display: block;
+    margin-top: 40px;
+}
+
+.adm {
+    padding: 80px 20px;
+    text-align: center;
+    flex-grow: 1;
+}
+
+.admission_form {
+    margin: auto;
+    margin-top: 30px;
+    background: var(--card);
+    padding: 30px;
+    width: 420px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: 0 0 0 2px rgba(190, 18, 60, 0.3);
+}
+
+.decor {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.label {
+    width: 130px;
+    text-align: right;
+    color: var(--muted);
+    font-size: 14px;
+    padding-right: 10px;
+}
+
+.input {
+    flex: 1;
+    height: 40px;
+    padding: 0 10px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: #020617;
+    color: var(--text);
+    transition: var(--transition);
+}
+.input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(190, 18, 60, 0.3);
+    outline: none;
+}
+
+/* ==========================================================================
+   11. FOOTER
+   ========================================================================== */
+footer {
+    background: #020617;
+    padding: 30px 20px;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+}
+.footer_txt {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+/* ==========================================================================
+   12. LOGIN INDEPENDENT CONTEXTS
+   ========================================================================== */
+body.login-page {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #020617, #0f172a);
+}
+.container-box {
+    width: 100%;
+    max-width: 380px;
+    padding: 32px;
+    background: var(--card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+.title {
+    font-size: 26px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 24px;
+}
+.input-group {
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+}
+.input-group label {
+    font-size: 13px;
+    margin-bottom: 6px;
+    color: var(--muted);
+}
+.input-group input {
+    height: 42px;
+    padding: 0 12px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: #020617;
+    color: var(--text);
+    font-size: 14px;
+    transition: var(--transition);
+}
+.input-group input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(190, 18, 60, 0.3);
+    outline: none;
+}
+.btn-login {
+    width: 100%;
+    height: 42px;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--primary);
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 15px;
+}
+.btn-login:hover {
+    background: var(--primary-hover);
+}
+
+/* ==========================================================================
+   13. DASHBOARD & INTERACTION COMPONENT INTERFACES
+   ========================================================================== */
+.dt-button {
+    background-color: var(--primary) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 5px 15px !important;
+    margin-right: 5px !important;
+}
+.dt-button:hover {
+    background-color: var(--primary-hover) !important;
+}
+
+.dash-container {
+    margin-top: 100px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.avatar-section {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+.avatar-main {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%; 
+    object-fit: cover;  
+    border: 3px solid var(--primary);
+    background: var(--card);
+}
+.avatar-initial {
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.divider {
+    width: 50px;
+    height: 2px;
+    background: var(--primary);
+    margin: 10px 0;
+}
+
+.stats-group {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    max-width: 500px;
+}
+.stat-item {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 15px;
+    text-align: center;
+}
+.stat-item .value {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+}
+.stat-item .label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+}
+
+.cta {
+    display: block;
+    background: var(--primary);
+    color: white;
+    text-align: center;
+    padding: 12px 30px;
+    border-radius: var(--radius);
+    text-decoration: none;
+    font-weight: bold;
+    transition: var(--transition);
+}
+.cta:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+/* ANIMATIONS */
+@keyframes welcomeFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.dash-container { animation: welcomeFadeUp 0.8s ease-out forwards; }
+.stats-group { opacity: 0; animation: welcomeFadeUp 0.8s ease-out 0.3s forwards; }
