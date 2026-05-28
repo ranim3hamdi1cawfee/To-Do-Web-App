@@ -299,7 +299,7 @@ function buildListItem(task) {
             <div class="list-header">
                 <span class="list-title">${escHtml(task.title)}</span>
                 <div class="list-actions">
-                <a class="btn-sm btn-edit" href="modify_task.php?id=${task.id}" title="Modifier" style='text-decoration: none;'>MODIFIER✎</a>
+                    ${isAdmin() ? `<a class="btn-sm btn-edit" href="modify_task.php?id=${task.id}" title="Modifier" style='text-decoration: none;'>MODIFIER✎</a>` : ''}
                     ${isAdmin() && canRewind  ? `<button class="btn-sm action-rewind"  title="Reculer">←</button>` : ''}
                     ${isAdmin() && canAdvance ? `<button class="btn-sm action-advance" title="Avancer">→</button>` : ''}
                     ${isAdmin()               ? `<button class="btn-sm btn-danger action-delete" title="Supprimer">✕</button>` : ''}
@@ -389,4 +389,20 @@ function toast(msg, type = 'success') {
 // ─────────────────────────────────────────────────────────────
 //  INIT
 // ─────────────────────────────────────────────────────────────
-showLoginScreen();
+async function init() {
+    try {
+        const res  = await fetch('check_session.php', { credentials: 'include' });
+        const data = await res.json();
+        if (data.logged_in) {
+            currentUser = { username: data.username, role: data.role };
+            addLogoutButton();
+            await loadTasks();
+        } else {
+            showLoginScreen();
+        }
+    } catch {
+        showLoginScreen();
+    }
+}
+
+init();
