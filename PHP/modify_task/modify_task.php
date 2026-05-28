@@ -1,8 +1,4 @@
 <?php
-/* ============================================================
-   modify_task.php
-   Affiche le formulaire de modification d'une tâche.
-   ============================================================ */
 
 session_start();
 
@@ -17,7 +13,7 @@ $role     = $_SESSION['role'];        // 'Admin' ou 'Regular'
 $username = $_SESSION['username'];
 $isAdmin  = ($role === 'Admin');
 
-// Récupérer l'id de la tâche depuis l'URL (ex: modify_task.php?id=5)
+// Récupérer l'id de la tâche depuis l'URL
 $taskId = (int) $_GET['id'];
 
 if ($taskId <= 0) {
