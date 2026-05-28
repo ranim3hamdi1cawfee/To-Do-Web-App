@@ -100,7 +100,7 @@ if (!isset($_SESSION['user_id'])) {
                 tbody.innerHTML = "";
 
                 if (!data.tasks || data.tasks.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="<?= $_SESSION['role'] == "Admin" ? 6 : 5 ?>"> style="text-align:center; color: var(--muted);">No tasks yet.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="<?= $_SESSION['role'] == "Admin" ? 6 : 5 ?>" style="text-align:center; color: var(--muted);">No tasks yet.</td></tr>`;
                     return;
                 }
 
