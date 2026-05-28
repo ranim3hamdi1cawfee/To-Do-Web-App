@@ -25,7 +25,7 @@ $currentUser = [
     <link rel="stylesheet" href="../../css/style.css">
 </head>
 <body>
-    <?php require_once("../../login_logic/navbar.php"); ?>
+    <?php require_once("../../welcome/navbar.php"); ?>
     <div class="noise"></div>
     <header>
         <div class="header-left">
