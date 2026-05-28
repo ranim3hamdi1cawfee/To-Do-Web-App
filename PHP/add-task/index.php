@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskFlow — Planning Mode</title>
+    <title>Planning Mode</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
@@ -113,13 +113,6 @@
     <?php require_once("../welcome/navbar.php"); ?>
     <div class="noise"></div>
     <header>
-        <div class="header-left">
-            <div class="logo-mark">TF</div>
-            <div>
-                <h1>TaskFlow</h1>
-                <span class="mode-badge">● Planning Mode</span>
-            </div>
-        </div>
         <div class="header-right">
             <div class="stat-pill">
                 <span class="stat-num" id="active-count">0</span>
