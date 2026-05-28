@@ -1,15 +1,9 @@
 <?php
-/* ============================================================
-   update_task.php
-   Reçoit les données du formulaire (en JSON) et met à jour
-   la tâche dans la base.
-   ============================================================ */
 
 session_start();
 header('Content-Type: application/json');
 
-require_once '../login_logic/db.php';
-
+require_once __DIR__ . '/../add-task/db.php';
 // Vérifier que l'utilisateur est connecté
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'error' => 'Non connecté.']);
