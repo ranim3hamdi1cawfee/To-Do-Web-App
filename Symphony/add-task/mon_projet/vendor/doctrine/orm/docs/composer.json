@@ -1,9 +1,0 @@
-{
-    "name": "doctrine/orm-docs",
-    "description": "Documentation for the Object-Relational Mapper\"",
-    "type": "library",
-    "license": "MIT",
-    "require-dev": {
-        "doctrine/docs-builder": "^1.0"
-    }
-}

@@ -1,6 +1,0 @@
-doctrine:
-    dbal:
-        default_connection: default
-
-    orm:
-        fetch_mode_subselect_batch_size: 10000

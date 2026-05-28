@@ -1,7 +1,0 @@
-{
-    "symfony": {
-        "importmap": {
-            "@symfony/test": true
-        }
-    }
-}
