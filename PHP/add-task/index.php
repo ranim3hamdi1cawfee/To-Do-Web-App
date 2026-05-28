@@ -46,19 +46,23 @@ $currentUser = [
 <body>
     <?php require_once("../welcome/navbar.php"); ?>
     <div class="noise"></div>
-    <header>
-        <div class="header-right">
-            <div class="stat-pill">
-                <span class="stat-num" id="active-count">0</span>
-                <span class="stat-label">Active</span>
-            </div>
-            <div class="stat-pill stat-pill--accent">
-                <span class="stat-num" id="urgent-count">0</span>
-                <span class="stat-label">Urgent</span>
-            </div>
-        </div>
-    </header>
 
+
+    <header>
+    <div class="header-left">
+        <span class="page-title">✎ Formulaire</span>
+    </div>
+    <div class="header-right">
+        <div class="stat-pill">
+            <span class="stat-num" id="active-count">0</span>
+            <span class="stat-label">Active</span>
+        </div>
+        <div class="stat-pill stat-pill--accent">
+            <span class="stat-num" id="urgent-count">0</span>
+            <span class="stat-label">Urgent</span>
+        </div>
+    </div>
+</header>
     <main>
         <aside class="panel panel--create">
             <div class="panel-header">
