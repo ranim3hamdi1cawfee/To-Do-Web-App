@@ -2,13 +2,8 @@
 
 session_start();
 
-<<<<<<< HEAD
-require_once __DIR__ . '/../add-task/db.php';
-require_once __DIR__ . '/../login_logic/auth_guard.php';
-=======
 require_once '../add-task/db.php';
 require_once '../login_logic/auth_guard.php';
->>>>>>> 09b2efca01419fbceeb3c35cc8aa5015bafe853f
 
 // Vérifier que l'utilisateur est connecté
 requireLogin();
