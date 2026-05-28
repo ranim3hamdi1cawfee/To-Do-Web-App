@@ -187,7 +187,7 @@ function buildListItem(task) {
             <div class="list-header">
                 <span class="list-title">${escHtml(task.title)}</span>
                 <div class="list-actions">
-                    ${isAdmin() ? `<a class="btn-sm btn-edit" href="modify_task.php?id=${task.id}" title="Modifier" style='text-decoration: none;'>MODIFIER✎</a>` : ''}
+                    ${isAdmin() ? `<a class="btn-sm btn-edit" href="../modify_task/modify_task.php?id=${task.id}" title="Modifier">MODIFIER✎</a>` : ''}
                     ${isAdmin() && canRewind  ? `<button class="btn-sm action-rewind"  title="Reculer">←</button>` : ''}
                     ${isAdmin() && canAdvance ? `<button class="btn-sm action-advance" title="Avancer">→</button>` : ''}
                     ${isAdmin()               ? `<button class="btn-sm btn-danger action-delete" title="Supprimer">✕</button>` : ''}
