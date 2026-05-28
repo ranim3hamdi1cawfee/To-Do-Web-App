@@ -1,63 +1,79 @@
-
-
 var periodeActive = "today";
 
-/* Filtrer par période */
 function getTachesParPeriode(periode) {
-  var taches = window.TACHES_PHP || [];
+  var toutesLesTouches = window.TACHES_PHP || [];
+  var role     = window.USER_ROLE     || 'Regular';
+  var groupId  = window.USER_GROUP_ID || null;
+
+  var taches = toutesLesTouches;
+  
+  // Filtrage par groupe pour les utilisateurs réguliers
+  if (role !== 'Admin' && groupId !== null) {
+    taches = toutesLesTouches.filter(function(t) {
+      return t.group_id == groupId;
+    });
+  }
+
+  // Obtenir les composants de la date d'aujourd'hui en heure locale
   var auj = new Date();
-  auj.setHours(0, 0, 0, 0);
+  var aujAnnee = auj.getFullYear();
+  var aujMois  = auj.getMonth(); 
+  var aujJour  = auj.getDate();
+
+  // Définir les limites de la semaine courante 
+  var jourSemaine = auj.getDay(); 
+  var decalageLundi = (jourSemaine === 0) ? -6 : 1 - jourSemaine;
+  
+  var lundi = new Date(aujAnnee, aujMois, aujJour + decalageLundi, 0, 0, 0, 0);
+  var dimanche = new Date(aujAnnee, aujMois, aujJour + decalageLundi + 6, 23, 59, 59, 999);
 
   return taches.filter(function(tache) {
-    var dateStr   = (tache.date || "").slice(0, 10);
-    var dateTache = new Date(dateStr + "T00:00:00");
+    var bruteDate = tache.date || tache.due_date || "";
+    if (!bruteDate) return false;
 
+    // Découpage et nettoyage de la chaîne de date (gère '2026-04-01' et '2026-4-1')
+    var segments = bruteDate.trim().split('-');
+    if (segments.length !== 3) return false;
+
+    var tAnnee = parseInt(segments[0], 10);
+    var tMois  = parseInt(segments[1], 10) - 1; 
+    var tJour  = parseInt(segments[2], 10);
+
+    // Instanciation de la date de la tâche à midi pour éviter les sauts de fuseau horaire
+    var dateObj = new Date(tAnnee, tMois, tJour, 12, 0, 0, 0);
+    
+    // Sauvegarder la version normalisée pour l'affichage des graphiques
+    tache.date = tAnnee + "-" + String(tMois + 1).padStart(2, '0') + "-" + String(tJour).padStart(2, '0');
+
+    // 1. Filtrage : Aujourd'hui
     if (periode === "today") {
-      return dateStr === new Date().toISOString().slice(0, 10);
+      return tAnnee === aujAnnee && tMois === aujMois && tJour === aujJour;
     }
+
+    // filtrage : week
     if (periode === "week") {
-      var lundi = new Date(auj);
-      var j = auj.getDay();
-      lundi.setDate(auj.getDate() + (j === 0 ? -6 : 1 - j));
-      return dateTache >= lundi;
+      return dateObj >= lundi && dateObj <= dimanche;
     }
+
+    // filtrage : month
     if (periode === "month") {
-      return dateTache.getMonth()    === auj.getMonth() &&
-             dateTache.getFullYear() === auj.getFullYear();
+      return tAnnee === aujAnnee && tMois === aujMois;
     }
+
+    // filtrage : year
     if (periode === "year") {
-      return dateTache.getFullYear() === auj.getFullYear();
+      return tAnnee === aujAnnee;
     }
+
     return false;
   });
 }
 
 function estTerminee(tache) {
-  return tache.faite === true || tache.status === 'done';
+  return tache.faite === true || tache.movement === 'andante';
 }
 
-/* Calculer le top user sur la période  */
-function getTopUser(taches) {
-  var compteur = {};
-  taches.forEach(function(t) {
-    if (estTerminee(t) && t.created_by) {
-      var uid = t.created_by;
-      compteur[uid] = (compteur[uid] || 0) + 1;
-    }
-  });
-
-  var topId = null, topCount = 0;
-  Object.keys(compteur).forEach(function(uid) {
-    if (compteur[uid] > topCount) {
-      topCount = compteur[uid];
-      topId    = uid;
-    }
-  });
-
-  return topCount > 0 ? { id: topId, count: topCount } : null;
-}
-
-/*  Mettre à jour la page  */
+/* Mettre à jour toute la page */
 function mettreAJourPage() {
   var taches    = getTachesParPeriode(periodeActive);
   var total     = taches.length;
@@ -65,82 +81,89 @@ function mettreAJourPage() {
   var restantes = total - faites;
   var taux      = total > 0 ? Math.round((faites / total) * 100) : 0;
 
-  /* KPI */
+  /* Affichage des KPIs */
   document.getElementById("kpi-total").textContent     = total;
   document.getElementById("kpi-faites").textContent    = faites;
   document.getElementById("kpi-restantes").textContent = restantes;
   document.getElementById("kpi-taux").textContent      = taux + "%";
 
-  /* Barre */
-  document.getElementById("barre-progress").style.width     = taux + "%";
-  document.getElementById("legende-faites").textContent     = faites + " Done";
-  document.getElementById("legende-restantes").textContent  = restantes + " Todo-Doing";
-  document.getElementById("legende-pct").textContent        = taux + "%";
-
-  /* Top user sur la période (met à jour le compteur dans le bandeau) */
-  var topEl = document.getElementById("top-count");
-  if (topEl) {
-    var top = getTopUser(taches);
-    topEl.textContent = top ? top.count : 0;
-  }
+  /* Affichage de la barre de progression */
+  document.getElementById("barre-progress").style.width    = taux + "%";
+  document.getElementById("legende-faites").textContent    = faites + " Done";
+  document.getElementById("legende-restantes").textContent = restantes + " Todo/Doing";
+  document.getElementById("legende-pct").textContent       = taux + "%";
 
   dessinerGraphique(taches);
 }
 
-/* Graphique */
+/* Dessiner le graphique dynamique */
 function dessinerGraphique(taches) {
   var conteneur = document.getElementById("graphique");
   var axeY      = document.getElementById("axe-y");
   var titrGraph = document.getElementById("titre-graphique");
+  if(!conteneur || !axeY || !titrGraph) return;
+
   conteneur.innerHTML = "";
   axeY.innerHTML      = "";
 
   var groupes = [];
 
   if (periodeActive === "today") {
-    titrGraph.textContent = "Task per hour - Today";
-    conteneur.className   = "graphique mode-jour";
-    for (var h = 0; h < 24; h++) groupes.push({ label: h + "h", faites: 0, reste: 0 });
+    titrGraph.textContent = "Tasks per hour — Today";
+    conteneur.className   = "graphique mode-semaine";
+    ["Todo\n", "Doing\n", "Done\n"].forEach(function(l) {
+      groupes.push({ label: l, faites: 0, reste: 0 });
+    });
     taches.forEach(function(t) {
-      var h = typeof t.heure === 'number' ? t.heure : 0;
-      h = Math.min(Math.max(h, 0), 23);
-      if (estTerminee(t)) groupes[h].faites++; else groupes[h].reste++;
+      if (t.movement === 'andante')  groupes[2].faites++;
+      else if (t.movement === 'moderato') groupes[1].reste++;
+      else                                groupes[0].reste++;
     });
   }
   else if (periodeActive === "week") {
-    titrGraph.textContent = "Task per day — This week";
+    titrGraph.textContent = "Tasks per day — This Week";
     conteneur.className   = "graphique mode-semaine";
     ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].forEach(function(j) {
       groupes.push({ label: j, faites: 0, reste: 0 });
     });
     taches.forEach(function(t) {
-      var numJS = new Date((t.date || "").slice(0,10) + "T00:00:00").getDay();
-      var idx   = numJS === 0 ? 6 : numJS - 1;
-      if (estTerminee(t)) groupes[idx].faites++; else groupes[idx].reste++;
+      var segments = t.date.split('-');
+      var numJS = new Date(parseInt(segments[0],10), parseInt(segments[1],10)-1, parseInt(segments[2],10), 12, 0, 0).getDay();
+      var idx   = (numJS === 0) ? 6 : numJS - 1;
+      if(idx >= 0 && idx < 7) {
+        if (estTerminee(t)) groupes[idx].faites++;
+        else                groupes[idx].reste++;
+      }
     });
   }
   else if (periodeActive === "month") {
-    titrGraph.textContent = "Task per day — This Month";
+    titrGraph.textContent = "Tasks by day — This Month";
     conteneur.className   = "graphique mode-mois";
     var auj = new Date();
     var nbJ = new Date(auj.getFullYear(), auj.getMonth() + 1, 0).getDate();
     for (var d = 1; d <= nbJ; d++) groupes.push({ label: String(d), faites: 0, reste: 0 });
     taches.forEach(function(t) {
-      var idx = new Date((t.date || "").slice(0,10) + "T00:00:00").getDate() - 1;
+      var segments = t.date.split('-');
+      var idx = parseInt(segments[2], 10) - 1;
       if (idx >= 0 && idx < groupes.length) {
-        if (estTerminee(t)) groupes[idx].faites++; else groupes[idx].reste++;
+        if (estTerminee(t)) groupes[idx].faites++;
+        else                groupes[idx].reste++;
       }
     });
   }
   else if (periodeActive === "year") {
-    titrGraph.textContent = "Task per month — This Year";
+    titrGraph.textContent = "Tasks per month — This Year";
     conteneur.className   = "graphique mode-annee";
     ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].forEach(function(m) {
       groupes.push({ label: m, faites: 0, reste: 0 });
     });
     taches.forEach(function(t) {
-      var idx = new Date((t.date || "").slice(0,10) + "T00:00:00").getMonth();
-      if (estTerminee(t)) groupes[idx].faites++; else groupes[idx].reste++;
+      var segments = t.date.split('-');
+      var idx = parseInt(segments[1], 10) - 1;
+      if (idx >= 0 && idx < 12) {
+        if (estTerminee(t)) groupes[idx].faites++;
+        else                groupes[idx].reste++;
+      }
     });
   }
 
@@ -162,24 +185,20 @@ function dessinerGraphique(taches) {
   groupes.forEach(function(grp, index) {
     var hautFaites = Math.round((grp.faites / maxVal) * hauteur);
     var hautReste  = Math.round((grp.reste  / maxVal) * hauteur);
-    var classeLabel = "label-colonne" +
-      (periodeActive === "month" && index % 2 !== 0 ? " cache" : "");
+    var classeLabel = "label-colonne" + (periodeActive === "month" && index % 2 !== 0 ? " cache" : "");
 
     var col = document.createElement("div");
     col.className = "groupe-colonne";
     col.innerHTML =
       '<div class="barres-duo">' +
-        '<div class="barre-graph faites" style="height:' + hautFaites + 'px"' +
-             ' data-info="' + grp.faites + ' done"></div>' +
-        '<div class="barre-graph a-faire" style="height:' + hautReste + 'px"' +
-             ' data-info="' + grp.reste + ' todo/doing"></div>' +
+        '<div class="barre-graph faites" style="height:' + hautFaites + 'px"' + ' data-info="' + grp.faites + ' done (andante)"></div>' +
+        '<div class="barre-graph a-faire" style="height:' + hautReste + 'px"' + ' data-info="' + grp.reste + ' todo/doing"></div>' +
       '</div>' +
       '<span class="' + classeLabel + '">' + grp.label + '</span>';
     conteneur.appendChild(col);
   });
 }
 
-/* Changer de période */
 function changerPeriode(periode, bouton) {
   periodeActive = periode;
   document.querySelectorAll(".btn-periode").forEach(function(b) {
