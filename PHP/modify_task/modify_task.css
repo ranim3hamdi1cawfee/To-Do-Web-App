@@ -1,5 +1,6 @@
 
 :root {
+<<<<<<< Updated upstream
     --bg: #070912;
     --card: #14151c;
     --input: #1b1d27;
@@ -20,10 +21,41 @@ body {
     background: var(--bg);
     color: var(--text);
     font-family: "Segoe UI", Arial, sans-serif;
+=======
+    --bg: #041f2b;
+    --surface: #062b3a;
+    --surface2: #082f42;
+    --border: rgba(255,255,255,.14);
+    --text: #f4f7fb;
+    --muted: #9eb4c2;
+    --accent: #c8fb4b;
+    --blue: #5fb8ff;
+    --yellow: #f5c842;
+    --red: #ff5f5f;
+    --radius: 14px;
+    --font: Arial, sans-serif;
+    --mono: "DM Mono", monospace;
+}
+
+/* Page */
+html,
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg) !important;
+    color: var(--text) !important;
+    font-family: var(--mono);
+}
+
+/* Cacher TF / TaskFlow / Modify Task à gauche */
+header .header-left {
+    display: none !important;
+>>>>>>> Stashed changes
 }
 
 /* Header */
 header {
+<<<<<<< Updated upstream
     height: 72px;
     padding: 0 2.5rem;
     background: var(--bg);
@@ -73,6 +105,38 @@ header {
     border: 1px solid var(--border);
     color: var(--muted);
     font-size: .78rem;
+=======
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 1.2rem 1rem 0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+header .header-right {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+}
+
+/* Badge admin + bouton back */
+.mt-user-badge,
+.mt-back-btn {
+    font-size: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: .45rem 1rem;
+    font-family: var(--mono);
+}
+
+.mt-user-badge {
+    color: var(--muted);
+}
+
+.mt-back-btn {
+    color: var(--text);
+>>>>>>> Stashed changes
     text-decoration: none;
 }
 
@@ -81,50 +145,103 @@ header {
     border-color: var(--accent);
 }
 
+<<<<<<< Updated upstream
 /* Contenu */
 .mt-main {
     max-width: 760px;
     margin: 0 auto;
     padding: 3rem 1rem;
+=======
+/* Main + card */
+.mt-main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+>>>>>>> Stashed changes
 }
 
 .mt-card {
     background: var(--card);
     border: 1px solid var(--border);
+<<<<<<< Updated upstream
     border-radius: 16px;
     padding: 2rem;
     display: flex;
     flex-direction: column;
     gap: 1.3rem;
+=======
+    border-radius: 18px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.35rem;
+    box-shadow: 0 24px 60px rgba(0,0,0,.35);
+>>>>>>> Stashed changes
 }
 
 .mt-title {
     margin: 0;
+<<<<<<< Updated upstream
     font-size: 1.25rem;
+=======
+>>>>>>> Stashed changes
     color: var(--text);
 }
 
+<<<<<<< Updated upstream
 /* Badge admin/user */
+=======
+/* Badges */
+>>>>>>> Stashed changes
 .mt-badge {
     width: fit-content;
     padding: .35rem .75rem;
     border-radius: 99px;
+<<<<<<< Updated upstream
     font-size: .68rem;
     font-weight: 700;
     letter-spacing: 1px;
+=======
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+>>>>>>> Stashed changes
     text-transform: uppercase;
 }
 
 .mt-badge--admin {
     color: var(--accent);
+<<<<<<< Updated upstream
     background: rgba(200, 251, 75, .12);
     border: 1px solid rgba(200, 251, 75, .35);
+=======
+    background: rgba(200,251,75,.10);
+    border: 1px solid rgba(200,251,75,.35);
+>>>>>>> Stashed changes
 }
 
 .mt-badge--user {
     color: var(--blue);
+<<<<<<< Updated upstream
     background: rgba(143, 179, 217, .12);
     border: 1px solid rgba(143, 179, 217, .35);
+=======
+    background: rgba(95,184,255,.10);
+    border: 1px solid rgba(95,184,255,.35);
+}
+
+/* Form */
+.mt-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.mt-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+>>>>>>> Stashed changes
 }
 
 /* Formulaire */
@@ -132,6 +249,7 @@ header {
 .mt-field {
     display: flex;
     flex-direction: column;
+<<<<<<< Updated upstream
 }
 
 .mt-form {
@@ -152,10 +270,20 @@ header {
     color: var(--blue);
     font-size: .68rem;
     font-weight: 700;
+=======
+    gap: .55rem;
+}
+
+.mt-field label {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 600;
+>>>>>>> Stashed changes
     letter-spacing: 1.2px;
     text-transform: uppercase;
 }
 
+<<<<<<< Updated upstream
 /* Champs */
 .mt-field input,
 .mt-field textarea {
@@ -168,6 +296,27 @@ header {
     padding: .85rem 1rem;
     font-size: .85rem;
     outline: none;
+=======
+/* Inputs */
+.mt-field input[type="text"],
+.mt-field input[type="date"],
+.mt-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--surface2) !important;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    color: var(--text) !important;
+    padding: .85rem 1rem;
+    font-family: var(--mono);
+    font-size: 13px;
+    outline: none;
+    resize: none;
+}
+
+.mt-field textarea {
+    min-height: 115px;
+>>>>>>> Stashed changes
 }
 
 .mt-field textarea {
@@ -180,7 +329,22 @@ header {
     border-color: var(--accent);
 }
 
+<<<<<<< Updated upstream
 /* Radio cards */
+=======
+.mt-field--locked input,
+.mt-field--locked textarea {
+    opacity: .5;
+    cursor: not-allowed;
+    border-style: dashed;
+}
+
+.mt-field input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) opacity(.55);
+}
+
+/* Priority + status */
+>>>>>>> Stashed changes
 .mt-priority-grid,
 .mt-status-grid {
     display: grid;
@@ -196,6 +360,7 @@ header {
 .mt-priority-card,
 .mt-status-card {
     min-height: 44px;
+<<<<<<< Updated upstream
     background: var(--input);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -211,54 +376,113 @@ header {
 }
 
 /* Sélections */
+=======
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.mt-priority-card:hover,
+.mt-status-card:hover {
+    color: var(--text);
+    border-color: var(--muted);
+}
+
+/* États sélectionnés */
+>>>>>>> Stashed changes
 .mt-priority-opt--low input:checked ~ .mt-priority-card,
 .mt-status-opt--doing input:checked ~ .mt-status-card {
     color: var(--blue);
     border-color: var(--blue);
+<<<<<<< Updated upstream
+=======
+    background: rgba(95,184,255,.12);
+>>>>>>> Stashed changes
 }
 
 .mt-priority-opt--medium input:checked ~ .mt-priority-card {
     color: var(--yellow);
     border-color: var(--yellow);
+<<<<<<< Updated upstream
+=======
+    background: rgba(245,200,66,.12);
+>>>>>>> Stashed changes
 }
 
 .mt-priority-opt--high input:checked ~ .mt-priority-card {
     color: var(--red);
     border-color: var(--red);
+<<<<<<< Updated upstream
+=======
+    background: rgba(255,95,95,.12);
+>>>>>>> Stashed changes
 }
 
 .mt-status-opt--todo input:checked ~ .mt-status-card {
     color: var(--text);
     border-color: var(--text);
+<<<<<<< Updated upstream
+=======
+    background: rgba(255,255,255,.08);
+>>>>>>> Stashed changes
 }
 
 .mt-status-opt--done input:checked ~ .mt-status-card {
     color: var(--accent);
     border-color: var(--accent);
+<<<<<<< Updated upstream
+=======
+    background: rgba(200,251,75,.12);
+>>>>>>> Stashed changes
 }
 
 /* Boutons */
 .mt-actions {
     display: flex;
     justify-content: flex-end;
+<<<<<<< Updated upstream
     gap: .75rem;
+=======
+    gap: .8rem;
+>>>>>>> Stashed changes
     padding-top: 1.1rem;
     border-top: 1px solid var(--border);
 }
 
 .mt-btn {
     min-width: 95px;
+<<<<<<< Updated upstream
     padding: .7rem 1rem;
     border-radius: var(--radius);
     border: 1px solid var(--border);
     font-size: .82rem;
+=======
+    padding: .65rem 1rem;
+    border-radius: 13px;
+    border: 1px solid transparent;
+    font-family: var(--font);
+    font-size: 12px;
+>>>>>>> Stashed changes
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
 }
 
 .mt-btn--cancel {
+<<<<<<< Updated upstream
     background: var(--input);
+=======
+    background: var(--surface2);
+    border-color: var(--border);
+>>>>>>> Stashed changes
     color: var(--muted);
 }
 
@@ -270,10 +494,21 @@ header {
 .mt-btn--save {
     background: var(--accent);
     border-color: var(--accent);
+<<<<<<< Updated upstream
     color: #000;
     font-weight: 700;
 }
 
+=======
+    color: #000 !important;
+    font-weight: 700;
+}
+
+.mt-btn--save:hover {
+    background: #d4ff5a;
+}
+
+>>>>>>> Stashed changes
 .mt-btn--save:disabled {
     opacity: .55;
     cursor: not-allowed;
@@ -283,8 +518,14 @@ header {
 .mt-feedback {
     display: none;
     padding: .85rem 1rem;
+<<<<<<< Updated upstream
     border-radius: var(--radius);
     font-size: .85rem;
+=======
+    border-radius: 13px;
+    font-size: 13px;
+    border: 1px solid var(--border);
+>>>>>>> Stashed changes
 }
 
 .mt-feedback--success {
@@ -295,10 +536,16 @@ header {
 .mt-feedback--error {
     display: block;
     color: var(--red);
+<<<<<<< Updated upstream
+=======
+    background: rgba(255,95,95,.08);
+    border-color: rgba(255,95,95,.3);
+>>>>>>> Stashed changes
 }
 
 /* Responsive */
 @media (max-width: 700px) {
+<<<<<<< Updated upstream
     header {
         height: auto;
         padding: 1rem;
@@ -310,12 +557,40 @@ header {
     .mt-priority-grid,
     .mt-status-grid {
         grid-template-columns: 1fr;
+=======
+    header,
+    .mt-main {
+        padding: 1rem;
+    }
+
+    header {
+        justify-content: center;
+    }
+
+    header .header-right {
+        flex-wrap: wrap;
+        justify-content: center;
+>>>>>>> Stashed changes
     }
 
     .mt-card {
         padding: 1.4rem;
     }
 
+<<<<<<< Updated upstream
+=======
+    .mt-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 520px) {
+    .mt-priority-grid,
+    .mt-status-grid {
+        grid-template-columns: 1fr;
+    }
+
+>>>>>>> Stashed changes
     .mt-actions {
         flex-direction: column-reverse;
     }
