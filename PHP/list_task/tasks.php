@@ -77,9 +77,7 @@ if (!isset($_SESSION['user_id'])) {
                     <th>Priority</th>
                     <th>Status</th>
                     <th>Deadline</th>
-                    <?php if ($_SESSION['role'] == "Admin"): ?>
-                        <th>Actions</th>
-                    <?php endif; ?>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="task-table-body"></tbody>
@@ -114,12 +112,14 @@ if (!isset($_SESSION['user_id'])) {
                             <td><span class="badge ${task.priority}">${task.priority}</span></td>
                             <td>${task.status}</td>
                             <td>${task.due_date ?? ''}</td>
-                            <?php if ($_SESSION['role'] == "Admin"): ?>
                             <td class="actions">
+                                <?php if ($_SESSION['role'] != "Admin"): ?>
                                 <button class="done">✔</button>
+                                <?php endif; ?>
+                                <?php if ($_SESSION['role'] == "Admin"): ?>
                                 <button class="delete">✕</button>
+                                <?php endif; ?>
                             </td>
-                            <?php endif; ?>
                         </tr>
                     `;
                 });

@@ -318,6 +318,11 @@ tbody tr:hover {
   min-width: 260px;
 }
 
+.toast-edit {
+  border-left: 4px solid var(--medium);
+
+  color: var(--medium);
+}
 #group-filter:hover {
   border-color: var(--accent);
 }

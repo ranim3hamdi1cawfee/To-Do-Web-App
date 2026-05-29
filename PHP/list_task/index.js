@@ -69,8 +69,16 @@ document.addEventListener("click", async (e) => {
 
     const newStatus = currentStatus == "done" ? "todo" : "done";
 
-    await apiPut(id, {
-      status: newStatus,
+    await fetch("../modify_task/update_task.php", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+        status: newStatus,
+      }),
     });
 
     loadTasks();
