@@ -132,7 +132,6 @@
 <td class="actions-col">
 
     <div class="actions">
-
         {# USER #}
             {% if app.user and 'ROLE_USER' in app.user.roles and 'ROLE_ADMIN' not in app.user.roles %}
     {% if task.status != 'done' %}
@@ -147,6 +146,15 @@
     {% endif %}
 
 {% endif %}
+    {# MODIFY #}
+        {% if app.user %}
+            <a
+                href="{{ path('task_modify', {id: task.id}) }}"
+                class="btn-modify"
+            >
+                ✎
+            </a>
+        {% endif %}
        
 
         {% if app.user and 'ROLE_ADMIN' in app.user.roles %}
