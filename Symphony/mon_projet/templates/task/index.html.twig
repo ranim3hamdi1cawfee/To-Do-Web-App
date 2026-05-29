@@ -146,17 +146,17 @@
     {% endif %}
 
 {% endif %}
-    {# MODIFY #}
-        {% if app.user %}
-            <a
-                href="{{ path('task_modify', {id: task.id}) }}"
-                class="btn-modify"
-            >
-                ✎
-            </a>
-        {% endif %}
-       
+  {# MODIFY USER ONLY #}
+{% if app.user and 'ROLE_USER' in app.user.roles and 'ROLE_ADMIN' not in app.user.roles %}
 
+    <a
+        href="{{ path('task_modify', {id: task.id}) }}"
+        class="btn-modify"
+    >
+        ✎
+    </a>
+
+{% endif %}
         {% if app.user and 'ROLE_ADMIN' in app.user.roles %}
 
     {% if task.status == 'done' %}
@@ -177,9 +177,6 @@
     >
         ✕
     </a>
-    {% if app.user %}
-        <a href="{{ path('task_modify', {id: task.id}) }}" class="btn-modify">✎</a>
-    {% endif %}
 
 {% endif %}
 
