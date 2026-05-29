@@ -54,7 +54,7 @@ class Task
     //  Correspond exactement à la contrainte fk_task_user en BDD.
     // ─────────────────────────────────────────────────────────────
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'created_by', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private User $user;
 
     // ── GETTERS & SETTERS ────────────────────────────────────────

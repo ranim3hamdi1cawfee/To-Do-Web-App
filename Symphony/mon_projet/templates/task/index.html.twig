@@ -10,7 +10,7 @@
    Tout ce qui est dans base.html.twig s'affiche automatiquement
    (header, styles, etc.). On ne redéfinit que le bloc "body". #}
 {% extends 'base.html.twig' %}
-
+{% block body_class %}task-page{% endblock %}
 {# Surcharge du bloc title → affiché dans l'onglet du navigateur. #}
 {% block title %}TaskFlow — Liste{% endblock %}
 

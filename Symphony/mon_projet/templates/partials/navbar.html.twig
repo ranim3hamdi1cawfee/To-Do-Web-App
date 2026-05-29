@@ -5,9 +5,10 @@
         <li><a href="{{ path('app_welcome') }}">Home</a></li>
         <li><a href="{{ path('task_add') }}">Add Task</a></li>
         <li><a href="{{ path('task_list') }}">Tasks List</a></li>
-        <li><a href="#">Stats</a></li>
+        <li><a href="{{ path('app_statistics') }}">Stats</a></li>
         <li><a href="{{ path('app_logout') }}">Logout</a></li>
         <li class="nav-avatar">
+        
             <a href="{{ path('app_user_profile', {id: app.user.id}) }}">
                 {% if app.user.profileImage and app.user.profileImage != 'default_avatar.png' %}
                     <img src="{{ asset('uploads/' ~ app.user.profileImage) }}"

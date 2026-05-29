@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Hôte : 127.0.0.1:3307
--- Généré le : mer. 27 mai 2026 à 12:22
--- Version du serveur : 10.4.32-MariaDB
--- Version de PHP : 8.2.12
+-- Host: 127.0.0.1:3307
+-- Generation Time: May 29, 2026 at 12:54 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données : `taskflow`
+-- Database: `taskflow`
 --
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `doctrine_migration_versions`
+-- Table structure for table `doctrine_migration_versions`
 --
 
 CREATE TABLE `doctrine_migration_versions` (
@@ -34,7 +34,7 @@ CREATE TABLE `doctrine_migration_versions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `doctrine_migration_versions`
+-- Dumping data for table `doctrine_migration_versions`
 --
 
 INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_time`) VALUES
@@ -43,7 +43,7 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 -- --------------------------------------------------------
 
 --
--- Structure de la table `group`
+-- Table structure for table `group`
 --
 
 CREATE TABLE `group` (
@@ -53,7 +53,7 @@ CREATE TABLE `group` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `group`
+-- Dumping data for table `group`
 --
 
 INSERT INTO `group` (`id`, `name`, `created_at`) VALUES
@@ -66,7 +66,7 @@ INSERT INTO `group` (`id`, `name`, `created_at`) VALUES
 -- --------------------------------------------------------
 
 --
--- Structure de la table `task`
+-- Table structure for table `task`
 --
 
 CREATE TABLE `task` (
@@ -75,43 +75,29 @@ CREATE TABLE `task` (
   `priority` varchar(10) NOT NULL,
   `movement` varchar(20) NOT NULL,
   `tags` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`tags`)),
-  `due_date` varchar(20) DEFAULT NULL
+  `due_date` varchar(20) DEFAULT NULL,
+  `group_id` int(11) DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-ALTER TABLE task ADD COLUMN group_id INT(11) DEFAULT NULL;
 --
--- Déchargement des données de la table `task`
+-- Dumping data for table `task`
 --
 
-INSERT INTO `task` (`id`, `title`, `priority`, `movement`, `tags`, `due_date`) VALUES
-(5, 'Setup project repository', 'high', 'allegro', '[\"setup\",\"git\"]', '2026-04-01'),
-(6, 'Design database schema', 'high', 'allegro', '[\"database\",\"design\"]', '2026-04-05'),
-(7, 'Create login page UI', 'medium', 'allegro', '[\"ui\",\"login\"]', '2026-04-08'),
-(8, 'Implement authentication', 'high', 'allegro', '[\"auth\",\"security\"]', '2026-04-10'),
-(9, 'Build task CRUD API', 'high', 'allegro', '[\"api\",\"backend\"]', '2026-04-12'),
-(10, 'Design kanban board layout', 'medium', 'allegro', '[\"ui\",\"kanban\"]', '2026-04-15'),
-(11, 'Connect frontend to API', 'high', 'moderato', '[\"frontend\",\"api\"]', '2026-05-01'),
-(12, 'Add drag and drop support', 'medium', 'moderato', '[\"ui\",\"kanban\"]', '2026-05-05'),
-(13, 'Implement task filtering', 'low', 'moderato', '[\"frontend\",\"filter\"]', '2026-05-08'),
-(14, 'Write unit tests for API', 'medium', 'moderato', '[\"testing\",\"api\"]', '2026-05-10'),
-(15, 'Add priority color indicators', 'low', 'moderato', '[\"ui\",\"design\"]', '2026-05-15'),
-(16, 'Implement due date warnings', 'medium', 'andante', '[\"frontend\",\"ux\"]', '2026-05-18'),
-(17, 'Add user profile page', 'medium', 'andante', '[\"ui\",\"profile\"]', '2026-05-20'),
-(18, 'Implement role-based access', 'high', 'andante', '[\"security\",\"roles\"]', '2026-05-22'),
-(19, 'Add task search feature', 'low', 'moderato', '[\"frontend\",\"search\"]', '2026-05-25'),
-(20, 'Fix mobile responsiveness', 'medium', 'andante', '[\"css\",\"responsive\"]', '2026-05-28'),
-(21, 'Add toast notifications', 'low', 'moderato', '[\"ui\",\"ux\"]', '2026-05-30'),
-(22, 'Optimize database queries', 'high', 'andante', '[\"backend\",\"performance\"]', '2026-06-01'),
-(23, 'Write API documentation', 'medium', 'andante', '[\"docs\",\"api\"]', '2026-06-03'),
-(24, 'Deploy to production server', 'high', 'andante', '[\"devops\",\"deploy\"]', '2026-06-05'),
-(25, 'Add dark mode toggle', 'low', 'moderato', '[\"ui\",\"design\"]', '2026-06-08'),
-(28, 'Create admin dashboard', 'high', 'andante', '[\"admin\",\"ui\"]', '2026-06-15'),
-(29, 'Add CSV export for tasks', 'low', 'moderato', '[\"feature\",\"export\"]', '2026-06-18');
+INSERT INTO `task` (`id`, `title`, `priority`, `movement`, `tags`, `due_date`, `group_id`, `created_by`) VALUES
+(1, 'Create login page UI', 'medium', 'andante', '[\"ui\",\"login\"]', '2026-05-27', 5, NULL),
+(2, 'Implement authentication', 'high', 'moderato', '[\"auth\",\"security\"]', '2026-05-28', 5, NULL),
+(3, 'Build task CRUD API', 'high', 'allegro', '[\"api\",\"backend\"]', '2026-05-29', 5, NULL),
+(4, 'Fix responsive layout bugs', 'low', 'moderato', '[\"css\",\"responsive\"]', '2026-05-20', 5, NULL),
+(5, 'Write API documentation', 'medium', 'moderato', '[\"docs\",\"api\"]', '2026-05-27', NULL, NULL),
+(6, 'Optimize database queries', 'high', 'moderato', '[\"backend\",\"performance\"]', '2026-05-30', NULL, NULL),
+(7, 'Design kanban board layout', 'medium', 'allegro', '[\"ui, kanban\"]', '2026-05-26', 1, NULL),
+(13, 'Rather complicated task', 'medium', 'andante', '[\"backend\"]', '2026-05-28', NULL, NULL);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `user`
+-- Table structure for table `user`
 --
 
 CREATE TABLE `user` (
@@ -128,41 +114,47 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `user`
+-- Dumping data for table `user`
 --
 
 INSERT INTO `user` (`id`, `username`, `password`, `birthday`, `role`, `group_id`, `profile_image`, `motto`, `current_streak`, `created_at`) VALUES
 (1, 'admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '1995-03-15', 'Admin', 1, 'default_avatar.png', 'Lead with purpose.', 0, '2026-05-27 09:33:08'),
 (2, 'zeineb', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2000-05-20', 'Regular', 2, 'default_avatar.png', 'Design is everything.', 0, '2026-05-27 09:33:08'),
-(3, 'ranim', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '1999-08-10', 'Regular', 1, 'default_avatar.png', 'Code never lies.', 0, '2026-05-27 09:33:08'),
 (4, 'hamdi', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2001-12-01', 'Regular', 3, 'default_avatar.png', 'Test everything.', 0, '2026-05-27 09:33:08'),
-(5, 'cawfee', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '1998-07-25', 'Regular', 4, 'default_avatar.png', 'Ship it.', 0, '2026-05-27 09:33:08');
+(5, 'cawfee', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '1998-07-25', 'Regular', 4, 'default_avatar.png', 'Ship it.', 0, '2026-05-27 09:33:08'),
+(6, 'ranime', '$2y$10$ByvuMth3XKTKIBN8R2dJxukOB3sOWA5Vz6/CY.Sa8o5edHLNjCY5y', '2005-09-30', 'Regular', 5, 'default_avatar.png', 'Stay focused.', 0, '2026-05-27 20:36:59'),
+(7, 'emna', '$2y$10$d8qi0ekzdETQZ4ocwl6WkuBp8qEfdluCRCN/VyAxjo2vbN1KJWT16', '2004-02-02', 'Regular', 3, 'default_avatar.png', 'Stay focused.', 0, '2026-05-27 21:06:22'),
+(8, 'rouda', '$2y$13$dyBqvMBVJx5KHivm0McsW.95NVjQR.TDDKXj8aZOw.rTC97Hc1aB2', '2005-12-11', 'Admin', 4, 'default_avatar.png', 'Stay focused.', 0, '2026-05-27 21:06:45'),
+(10, 'khadija', '$2y$13$thZ.sSyn9/g7GyueV5AZTeDvzCdnqhyGO4vdAdm1PkkI5qY0wU5nO', '1980-09-01', 'Regular', 5, 'default_avatar.png', 'Stay focused.', 0, '2026-05-28 17:21:05'),
+(11, 'roudayna', '$2y$13$LLp5/3nBS9w1X6/TyA96AOP8Z5zxODJ8VqRhE5oYAXqxuDrB90p9q', '2006-11-15', 'Regular', NULL, 'default_avatar.png', 'Stay focused.', 0, '2026-05-28 16:22:05'),
+(13, 'josh', '$2y$10$dI7UgllO/zxLhXlF6K10zOKnI5qgj4g3kjPZgQhmZBnf97iDDEJs.', '2005-10-14', 'Admin', 5, 'default_avatar.png', 'Stay focused.', 0, '2026-05-28 19:18:33');
 
 --
--- Index pour les tables déchargées
+-- Indexes for dumped tables
 --
 
 --
--- Index pour la table `doctrine_migration_versions`
+-- Indexes for table `doctrine_migration_versions`
 --
 ALTER TABLE `doctrine_migration_versions`
   ADD PRIMARY KEY (`version`);
 
 --
--- Index pour la table `group`
+-- Indexes for table `group`
 --
 ALTER TABLE `group`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `name` (`name`);
 
 --
--- Index pour la table `task`
+-- Indexes for table `task`
 --
 ALTER TABLE `task`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_task_user` (`created_by`);
 
 --
--- Index pour la table `user`
+-- Indexes for table `user`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
@@ -170,33 +162,39 @@ ALTER TABLE `user`
   ADD KEY `fk_user_group` (`group_id`);
 
 --
--- AUTO_INCREMENT pour les tables déchargées
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT pour la table `group`
+-- AUTO_INCREMENT for table `group`
 --
 ALTER TABLE `group`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT pour la table `task`
+-- AUTO_INCREMENT for table `task`
 --
 ALTER TABLE `task`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
--- AUTO_INCREMENT pour la table `user`
+-- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
--- Contraintes pour les tables déchargées
+-- Constraints for dumped tables
 --
 
 --
--- Contraintes pour la table `user`
+-- Constraints for table `task`
+--
+ALTER TABLE `task`
+  ADD CONSTRAINT `fk_task_user` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user`
 --
 ALTER TABLE `user`
   ADD CONSTRAINT `fk_user_group` FOREIGN KEY (`group_id`) REFERENCES `group` (`id`) ON DELETE SET NULL;
