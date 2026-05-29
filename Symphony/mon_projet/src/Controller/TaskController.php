@@ -261,7 +261,7 @@ class TaskController extends AbstractController
         EntityManagerInterface $em
     ): Response {
 
-        $task->setStatus('in progress');
+        $task->setStatus('To Do');
 
         $em->flush();
 

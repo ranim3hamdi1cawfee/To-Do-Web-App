@@ -30,7 +30,7 @@ class Task
     private ?string $dueDate = null;
 
     #[ORM\Column(length: 30)]
-    private ?string $status = 'in progress';
+    private ?string $status = 'To Do';
 
     // ─────────────────────────────────────────────────────────────
     //  COLONNE group_id — conservée pour compatibilité avec le projet PHP/JS.
