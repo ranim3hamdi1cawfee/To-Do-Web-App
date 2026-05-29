@@ -31,7 +31,7 @@
     </div>
 
 </div>
-
+{% if is_granted('ROLE_ADMIN') %}
 <div class="filter-select">
 
 <form method="GET">
@@ -58,6 +58,7 @@
 </form>
 
 </div>
+{% endif %}
         {% if tasks is empty %}
 
     <div class="empty">
@@ -133,42 +134,43 @@
     <div class="actions">
 
         {# USER #}
-        {% if app.user and 'ROLE_USER' in app.user.roles and 'ROLE_ADMIN' not in app.user.roles %}
+            {% if app.user and 'ROLE_USER' in app.user.roles and 'ROLE_ADMIN' not in app.user.roles %}
+    {% if task.status != 'done' %}
 
-            {% if task.status != 'done' %}
+        <a
+            href="{{ path('task_complete', {id: task.id}) }}"
+            class="btn-complete"
+        >
+            ✓
+        </a>
 
-                <a
-                    href="{{ path('task_complete', {id: task.id}) }}"
-                    class="btn-complete"
-                >
-                    ✓
-                </a>
+    {% endif %}
 
-            {% else %}
+{% endif %}
+       
 
-                <a
-                    href="{{ path('task_restore', {id: task.id}) }}"
-                    class="btn-restore"
-                >
-                    ↺
-                </a>
-
-            {% endif %}
-
-        {% endif %}
-
-        {# ADMIN #}
         {% if app.user and 'ROLE_ADMIN' in app.user.roles %}
 
-            <a
-                href="{{ path('task_delete', {id: task.id}) }}"
-                class="btn-delete"
-                onclick="return confirm('Delete task ?')"
-            >
-                ✕
-            </a>
+    {% if task.status == 'done' %}
 
-        {% endif %}
+        <a
+            href="{{ path('task_restore', {id: task.id}) }}"
+            class="btn-restore"
+        >
+            ↺
+        </a>
+
+    {% endif %}
+
+    <a
+        href="{{ path('task_delete', {id: task.id}) }}"
+        class="btn-delete"
+        onclick="return confirm('Delete task ?')"
+    >
+        ✕
+    </a>
+
+{% endif %}
 
     </div>
 

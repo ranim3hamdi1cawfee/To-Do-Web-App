@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\GroupRepository;
+use App\Entity\User;
 
 class TaskController extends AbstractController
 {
@@ -30,44 +31,67 @@ class TaskController extends AbstractController
         TaskRepository $taskRepository,
         GroupRepository $groupRepository
     ): Response {
+        /** @var User $user */
+        $user = $this->getUser();
+
         $selectedGroup = $request->query->get('group');
 
-        if ($selectedGroup) {
+        if (in_array('ROLE_ADMIN', $user->getRoles())) {
 
-            $tasks = $taskRepository->findBy([
-                'groupId' => $selectedGroup
-            ]);
+            // ADMIN
+
+            if ($selectedGroup) {
+
+                $tasks = $taskRepository->findBy([
+                    'groupId' => $selectedGroup
+                ]);
+
+            } else {
+
+                $tasks = $taskRepository->findAll();
+
+            }
 
         } else {
 
-            $tasks = $taskRepository->findAll();
+            // USER
+
+            $tasks = $taskRepository->findBy([
+                'groupId' => $user->getGroup()
+            ]);
 
         }
 
         $groups = $groupRepository->findAll();
 
-        $activeCount = 0;
 
-        foreach ($tasks as $task) {
+        if (in_array('ROLE_ADMIN', $user->getRoles())) {
 
-            if ($task->getStatus() != 'done') {
-                $activeCount++;
-            }
+            // ADMIN
 
-        }
+            $activeCount = $taskRepository->count([
+                'status' => 'in progress'
+            ]);
 
-        $urgentCount = 0;
+            $urgentCount = $taskRepository->count([
+                'priority' => 'high',
+                'status' => 'in progress'
+            ]);
 
-        foreach ($tasks as $task) {
+        } else {
 
-            if (
-                $task->getPriority() == 'high'
-                && $task->getStatus() != 'done'
-            ) {
+            // USER
 
-                $urgentCount++;
+            $activeCount = $taskRepository->count([
+                'groupId' => $user->getGroup(),
+                'status' => 'in progress'
+            ]);
 
-            }
+            $urgentCount = $taskRepository->count([
+                'groupId' => $user->getGroup(),
+                'priority' => 'high',
+                'status' => 'in progress'
+            ]);
 
         }
         return $this->render('task/index.html.twig', [
