@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: May 29, 2026 at 09:02 PM
+-- Generation Time: May 29, 2026 at 09:09 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -75,7 +75,7 @@ CREATE TABLE `task` (
   `priority` varchar(10) NOT NULL,
   `movement` varchar(20) NOT NULL,
   `tags` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`tags`)),
-  `due_date` varchar(20) DEFAULT NULL,
+  `due_date` varchar(20) DEFAULT current_timestamp(),
   `group_id` int(11) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
   `status` varchar(50) NOT NULL DEFAULT 'in progress'
@@ -120,8 +120,7 @@ INSERT INTO `task` (`id`, `title`, `priority`, `movement`, `tags`, `due_date`, `
 (54, 'DHCPv6', 'high', 'moderato', '[\"lab\"]', '2026-05-30', 2, 1, 'in progress'),
 (55, 'SLAAC', 'high', 'andante', '[\"labs cisco 1 and 2\"]', '2026-05-30', 2, 2, 'in progress'),
 (56, 'FHRP', 'high', 'allegro', '[\"LAB CISCO VRRP\\/HSRP\"]', '2026-05-30', 2, 1, 'in progress'),
-(57, 'FHRP', 'high', 'allegro', '[\"HSRP\\/VRRP\"]', '2026-05-30', 2, 1, 'in progress'),
-(58, 'Merging work', 'high', 'andante', '[\"rather important\"]', '2026-05-05', 5, 6, 'in progress');
+(57, 'FHRP', 'high', 'allegro', '[\"HSRP\\/VRRP\"]', '2026-05-30', 2, 1, 'in progress');
 
 -- --------------------------------------------------------
 
@@ -152,7 +151,7 @@ INSERT INTO `user` (`id`, `username`, `password`, `birthday`, `role`, `group_id`
 (3, 'ranim', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '1999-08-10', 'Regular', 1, 'default_avatar.png', 'Code never lies.', 0, '2026-05-27 09:33:08'),
 (4, 'hamdi', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '2001-12-01', 'Regular', 3, 'default_avatar.png', 'Test everything.', 0, '2026-05-27 09:33:08'),
 (5, 'cawfee', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '1998-07-25', 'Regular', 4, 'default_avatar.png', 'Ship it.', 0, '2026-05-27 09:33:08'),
-(6, 'josh', '$2y$10$.lIAgLFVveb1jaYp6aotT.0A/R5nBfQXy3DOnmVlLmv1zS0dXS.pG', '2005-05-05', 'Admin', 5, 'default_avatar.png', 'Stay focused.', 0, '2026-05-29 12:56:21'),
+(6, 'josh', '$2y$13$Yv8gz67GySoBE.bzhB85nulJmalnG38imfHnRydqa3RDPaDy1F3s6', '2005-05-05', 'Admin', 5, 'default_avatar.png', 'Stay focused.', 0, '2026-05-29 12:56:21'),
 (7, 'roudayna', '$2y$13$f5c7rJg7OrzymdCBwoj6ZuysmDUCnfuDUADmRU99MQtin3XyIlzRi', '2005-05-05', 'Regular', NULL, 'default_avatar.png', 'Stay focused.', 0, '2026-05-29 12:04:02'),
 (8, 'rouda', '$2y$10$3umv6iyAcd5GgV1alrLsXeGZ2MH4DCnBmT62Z0M0LbolFVo3Y8VD.', '2005-05-05', 'Regular', 3, '1780065715_Screenshot 2026-02-12 202209.png', 'Stay focused.', 0, '2026-05-29 13:09:38'),
 (9, 'jo', '$2y$13$1J5x2.kS6C.ks9TbI5Ptwegm3ji0h8guer2hWpM8i5LoYLzRdLoWe', '2005-05-05', 'Regular', 5, 'default_avatar.png', 'Stay focused.', 0, '2026-05-29 12:10:58'),
@@ -205,7 +204,7 @@ ALTER TABLE `group`
 -- AUTO_INCREMENT for table `task`
 --
 ALTER TABLE `task`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --
 -- AUTO_INCREMENT for table `user`
