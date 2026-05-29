@@ -4,10 +4,7 @@ session_start();
 
 require_once '../add-task/db.php';
 require_once '../login_logic/auth_guard.php';
-<<<<<<< HEAD
 
-=======
->>>>>>> 5211afc45fcb9a0fe1f48b279629f82e88db0979
 // Vérifier que l'utilisateur est connecté
 requireLogin();
 
