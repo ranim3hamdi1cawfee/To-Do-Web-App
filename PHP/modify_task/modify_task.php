@@ -1,15 +1,8 @@
 <?php
 
 session_start();
-
-<<<<<<< Updated upstream
-require_once '../add-task/db.php';
-require_once '../login_logic/auth_guard.php';
-=======
 require_once __DIR__ . '/../add-task/db.php';
 require_once __DIR__ . '/../login_logic/auth_guard.php';
->>>>>>> Stashed changes
-
 // Vérifier que l'utilisateur est connecté
 requireLogin();
 
@@ -34,7 +27,6 @@ $task = $stmt->fetch();
 if (!$task) {
     die("Error: task not found.");
 }
-
 // Traduire les valeurs de la base vers le format du formulaire :
 // movement → status
 if ($task['movement'] === 'andante')  $status = 'todo';
@@ -176,17 +168,12 @@ $disabled = $isAdmin ? '' : 'disabled';
 
         </div>
     </section>
-
 </main>
-
-
 <!-- Passer les infos PHP au JavaScript -->
 <script>
     window.MT_ROLE = "<?php echo $role; ?>";
     window.MT_TASK_ID = <?php echo $taskId; ?>;
 </script>
-
 <script src="modify_task.js"></script>
-
 </body>
 </html>

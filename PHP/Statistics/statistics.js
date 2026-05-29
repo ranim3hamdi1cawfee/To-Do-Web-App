@@ -47,7 +47,15 @@ function getTachesParPeriode(periode) {
 
     // filtrage : today
     if (periode === "today") {
-      return tAnnee === aujAnnee && tMois === aujMois && tJour === aujJour;
+      // Tâche due aujourd'hui
+      var dueAujourdhui = tAnnee === aujAnnee && tMois === aujMois && tJour === aujJour;
+      
+      // Tache completee avec la due_date est dans le mois courant on la calcule pour aujourd'hui si elle vient d'être faite
+      var faiteCeMois = tache.movement === 'andante' 
+                        && tAnnee === aujAnnee 
+                        && tMois === aujMois;
+
+      return dueAujourdhui || faiteCeMois;
     }
 
     // filtrage : week
@@ -189,12 +197,24 @@ function dessinerGraphique(taches) {
 
     var col = document.createElement("div");
     col.className = "groupe-colonne";
-    col.innerHTML =
-      '<div class="barres-duo">' +
-        '<div class="barre-graph faites" style="height:' + hautFaites + 'px"' + ' data-info="' + grp.faites + ' done (andante)"></div>' +
-        '<div class="barre-graph a-faire" style="height:' + hautReste + 'px"' + ' data-info="' + grp.reste + ' todo/doing"></div>' +
-      '</div>' +
-      '<span class="' + classeLabel + '">' + grp.label + '</span>';
+    /*prendre en consideration un baton si periode today*/
+    if (periodeActive === "today") {
+      var hauteur_barre = grp.faites > 0 ? hautFaites : hautReste;
+      var classe_barre  = grp.faites > 0 ? "barre-graph faites" : "barre-graph a-faire";
+      var info_barre    = grp.faites > 0 ? grp.faites + " " + grp.label : grp.reste + " " + grp.label;
+      col.innerHTML =
+        '<div class="barres-duo">' +
+          '<div class="' + classe_barre + '" style="height:' + hauteur_barre + 'px" data-info="' + info_barre + '"></div>' +
+        '</div>' +
+        '<span class="' + classeLabel + '">' + grp.label + '</span>';
+    } else {
+      col.innerHTML =
+        '<div class="barres-duo">' +
+          '<div class="barre-graph faites" style="height:' + hautFaites + 'px" data-info="' + grp.faites + ' done"></div>' +
+          '<div class="barre-graph a-faire" style="height:' + hautReste + 'px" data-info="' + grp.reste + ' todo/doing"></div>' +
+        '</div>' +
+        '<span class="' + classeLabel + '">' + grp.label + '</span>';
+    }
     conteneur.appendChild(col);
   });
 }
