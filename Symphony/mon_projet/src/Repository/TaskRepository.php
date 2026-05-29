@@ -54,4 +54,38 @@ class TaskRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function findByPriority(?string $priority): array
+    {
+        if (!$priority) {
+            return $this->findBy([], ['id' => 'DESC']);
+        }
+
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.priority = :priority')
+            ->setParameter('priority', $priority)
+            ->orderBy('t.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function countActiveTasks(): int
+    {
+        return $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->where('t.status != :done')
+            ->setParameter('done', 'done')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countUrgentTasks(): int
+    {
+        return $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->where('t.priority = :urgent')
+            ->andWhere('t.status != :done')
+            ->setParameter('urgent', 'high')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

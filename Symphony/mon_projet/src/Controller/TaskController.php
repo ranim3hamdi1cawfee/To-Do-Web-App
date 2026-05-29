@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\GroupRepository;
 
 class TaskController extends AbstractController
 {
@@ -24,22 +25,63 @@ class TaskController extends AbstractController
     //  Équivalent du filtre WHERE group_id = ? dans l'ancienne api.php.
     // ─────────────────────────────────────────────────────────────
     #[Route('/tasks', name: 'task_list')]
-    public function index(TaskRepository $repo): Response
-    {
-        // denyAccessUnlessGranted → redirige vers /login si pas connecté.
-        // Équivalent de requireLogin() dans api.php.
-        $this->denyAccessUnlessGranted('ROLE_USER');
+    public function index(
+        Request $request,
+        TaskRepository $taskRepository,
+        GroupRepository $groupRepository
+    ): Response {
+        $selectedGroup = $request->query->get('group');
 
-        // getUser() retourne l'entité User connectée (ou null si non connecté).
-        // Comme on a déjà vérifié ROLE_USER, on sait qu'il est non-null ici.
-        $user = $this->getUser();
+        if ($selectedGroup) {
 
-        // findByUser() → SELECT * FROM task WHERE user_id = ? ORDER BY id DESC
-        // Chaque utilisateur ne voit QUE ses propres tâches.
-        $tasks = $repo->findByUser($user);
+            $tasks = $taskRepository->findBy([
+                'groupId' => $selectedGroup
+            ]);
 
+        } else {
+
+            $tasks = $taskRepository->findAll();
+
+        }
+
+        $groups = $groupRepository->findAll();
+
+        $activeCount = 0;
+
+        foreach ($tasks as $task) {
+
+            if ($task->getStatus() != 'done') {
+                $activeCount++;
+            }
+
+        }
+
+        $urgentCount = 0;
+
+        foreach ($tasks as $task) {
+
+            if (
+                $task->getPriority() == 'high'
+                && $task->getStatus() != 'done'
+            ) {
+
+                $urgentCount++;
+
+            }
+
+        }
         return $this->render('task/index.html.twig', [
+
             'tasks' => $tasks,
+
+            'groups' => $groups,
+
+            'selectedGroup' => $selectedGroup,
+
+            'activeCount' => $activeCount,
+
+            'urgentCount' => $urgentCount
+
         ]);
     }
 
@@ -173,9 +215,32 @@ class TaskController extends AbstractController
         }
 
         return $this->render('task/edit.html.twig', [
-            'form'         => $form->createView(),
-            'task'         => $task,
+            'form' => $form->createView(),
+            'task' => $task,
             'tags_default' => implode(', ', $task->getTags()),
         ]);
+    }
+    #[Route('/tasks/complete/{id}', name: 'task_complete')]
+    public function complete(
+        Task $task,
+        EntityManagerInterface $manager
+    ): Response {
+        $task->setStatus('done');
+
+        $manager->flush();
+
+        return $this->redirectToRoute('task_list');
+    }
+    #[Route('/tasks/restore/{id}', name: 'task_restore')]
+    public function restore(
+        Task $task,
+        EntityManagerInterface $em
+    ): Response {
+
+        $task->setStatus('in progress');
+
+        $em->flush();
+
+        return $this->redirectToRoute('task_list');
     }
 }

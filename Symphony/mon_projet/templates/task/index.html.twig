@@ -1,229 +1,186 @@
-{# ═══════════════════════════════════════════════════════════════
-   index.html.twig — Page liste des tâches
-   Hérite de base.html.twig via {% extends %}.
-   Reproduit la logique de renderList() + buildListItem() de index.js :
-   - Tous les users voient la liste.
-   - Seul l'admin voit les boutons modifier, changer statut, supprimer.
-   ═══════════════════════════════════════════════════════════════ #}
-
-{# {% extends %} → ce fichier hérite du layout base.html.twig.
-   Tout ce qui est dans base.html.twig s'affiche automatiquement
-   (header, styles, etc.). On ne redéfinit que le bloc "body". #}
 {% extends 'base.html.twig' %}
-{% block body_class %}task-page{% endblock %}
-{# Surcharge du bloc title → affiché dans l'onglet du navigateur. #}
-{% block title %}TaskFlow — Liste{% endblock %}
-
+{% block title %}TaskFlow{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/tasklist.css') }}">
+{% endblock %}
 {% block body %}
-<div class="layout">
 
-    {# ── SIDEBAR GAUCHE ─────────────────────────────────────────
-       Même panneau gauche que dans la version originale.
-       Le bouton +CREATE est visible par tous les utilisateurs connectés
-       (tout le monde peut créer une tâche, comme dans api.php case POST).
-    ──────────────────────────────────────────────────────────── #}
-    <div class="sidebar">
-        <div class="sidebar-title">
-            New Task
-            {# path('task_add') génère l'URL /tasks/add à partir du nom de route.
-               C'est l'équivalent Twig de generateUrl() côté PHP. #}
-            <a href="{{ path('task_add') }}" class="btn-create">+CREATE</a>
-        </div>
-        <p style="color:#444; font-size:13px; margin-top: 40px; text-align:center;">
-            Clique sur +CREATE<br>pour ajouter une tâche
-        </p>
+<div class="tasks-container">
 
-        {# ── LÉGENDE DES PRIORITÉS (visible pour tous) ──
-           Même logique visuelle que les badges badge-{priority} dans index.js. #}
-        <div style="margin-top: 40px; border-top: 1px solid #1e1e1e; padding-top: 24px;">
-            <div style="font-size: 11px; color: #333; letter-spacing: 2px; margin-bottom: 14px;">PRIORITÉS</div>
-            {# Chaque ligne affiche un exemple de bordure colorée selon la priorité musicale.
-               Correspond aux classes .task-item.ff / .f / .mf etc. dans base.html.twig. #}
-            <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;">
-                <span><span style="color:#ff4444;">■</span> Fortissimo (ff) — critique</span>
-                <span><span style="color:#f97316;">■</span> Forte (f) — haute</span>
-                <span><span style="color:#c8ff00;">■</span> Mezzo-forte (mf) — moyenne</span>
-                <span><span style="color:#34d399;">■</span> Piano (p) — basse</span>
-                <span><span style="color:#60a5fa;">■</span> Pianissimo (pp) — minimale</span>
-            </div>
-        </div>
-    </div>
-
-    {# ── PANNEAU PRINCIPAL ──────────────────────────────────────
-       Équivalent du panel--list dans l'ancienne version.
-    ──────────────────────────────────────────────────────────── #}
+    {# MAIN - liste #}
     <div class="main">
 
-        {# ── MESSAGES FLASH ─────────────────────────────────────
-           app.flashes('success') récupère les messages flash de type 'success'
-           stockés en session par addFlash() dans le contrôleur.
-           Équivalent du système de toasts dans index.js.
-           {% for ... in ... %} boucle sur le tableau de messages.
-           Une fois affichés, les messages flash sont automatiquement supprimés. #}
         {% for message in app.flashes('success') %}
-            <div class="flash-success">✓ {{ message }}</div>
-        {% endfor %}
-
-        {# Messages flash d'erreur (ex: mouvement invalide dans changeStatus) #}
-        {% for message in app.flashes('error') %}
-            <div class="flash-error">✕ {{ message }}</div>
+            <div class="flash">✓ {{ message }}</div>
         {% endfor %}
 
         <div class="main-header">
             <div class="main-title">All Tasks</div>
             <span style="color:#444; font-size:12px; letter-spacing:1px;">LIST</span>
         </div>
+<div class="stats-boxes">
 
-        {# ── ÉTAT VIDE ───────────────────────────────────────────
-           {% if tasks is empty %} → Twig teste si le tableau $tasks passé
-           par le contrôleur est vide. Équivalent du check filtered.length === 0 en JS. #}
-        {% if tasks is empty %}
-            <div class="empty">No tasks yet. Create one →</div>
-
-        {% else %}
-
-            {# ── GROUPEMENT PAR MOUVEMENT (STATUT) ───────────────
-               On regroupe les tâches par mouvement (statut) exactement comme
-               renderList() le faisait avec groups = { todo:[], doing:[], done:[] }.
-               Ici on crée manuellement 4 groupes correspondant aux 4 mouvements.
-
-               Twig n'a pas de "groupBy" natif, donc on filtre avec |filter.
-               Le filtre |filter(t => t.movement == 'andante') est disponible
-               depuis Twig 1.41+ (ou via l'extension Twig de Symfony). #}
-
-            <div class="status-groups">
-
-                {# On définit l'ordre et les labels des groupes dans un tableau Twig.
-                   Équivalent de statusOrder et statusLabels dans index.js. #}
-                {% set groups = [
-                    { key: 'andante', label: 'Andante — À faire',    icon: '○' },
-                    { key: 'allegro', label: 'Allegro — En cours',   icon: '◑' },
-                    { key: 'adagio',  label: 'Adagio — En attente',  icon: '◐' },
-                    { key: 'presto',  label: 'Presto — Urgent !',    icon: '●' },
-                ] %}
-
-                {# On boucle sur chaque groupe de statut. #}
-                {% for group in groups %}
-
-                    {# |filter → filtre le tableau tasks pour ne garder que ceux
-                       dont le mouvement correspond au groupe courant.
-                       task est la variable de boucle locale (comme .filter(t => ...) en JS). #}
-                    {% set groupTasks = tasks|filter(task => task.movement == group.key) %}
-
-                    {# On n'affiche le groupe que s'il a au moins une tâche
-                       (pour ne pas afficher des sections vides). #}
-                    {% if groupTasks|length > 0 %}
-                        <div>
-                            {# En-tête du groupe avec le nombre de tâches.
-                               |length → équivalent de .length en JS.
-                               Même rendu que status-group-header dans index.js. #}
-                            <div class="status-group-header">
-                                <span class="status-group-title">{{ group.icon }} {{ group.label }}</span>
-                                <span class="status-group-count">{{ groupTasks|length }}</span>
-                            </div>
-
-                            <ul class="task-list">
-                                {# Boucle sur les tâches du groupe.
-                                   |reverse → tâches récentes en premier (comme ORDER BY id DESC). #}
-                                {% for task in groupTasks|reverse %}
-                                    <li class="task-item {{ task.priority }}">
-                                        {# ── INFOS DE LA TÂCHE ──────────────────────────────────
-                                           Équivalent du bloc <div class="list-header">...</div>
-                                           dans buildListItem() de index.js. #}
-                                        <div style="flex:1; min-width:0;">
-                                            <div class="task-name">{{ task.title }}</div>
-                                            <div class="task-meta">
-                                                {# Badge priorité (couleur vert = pill-green, comme badge-{priority} en JS) #}
-                                                <span class="pill pill-green">{{ task.priority|upper }}</span>
-
-                                                {# Badge mouvement = statut (bleu) #}
-                                                <span class="pill pill-blue">{{ task.movement }}</span>
-
-                                                {# Boucle sur les tags du tableau JSON.
-                                                   task.tags appelle getTags() via le getter Doctrine.
-                                                   Chaque tag est affiché comme dans la version JS (<span class="tag">). #}
-                                                {% for tag in task.getTags() %}
-                                                    <span class="tag">{{ tag }}</span>
-                                                {% endfor %}
-
-                                                {# Date limite si définie (même logique que le 📅 en JS). #}
-                                                {% if task.dueDate %}
-                                                    <span class="pill">📅 {{ task.dueDate }}</span>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-
-                                        {# ── BOUTONS D'ACTION ─────────────────────────────────
-                                           is_granted('ROLE_ADMIN') → vérifie le rôle dans Twig.
-                                           Équivalent exact de if (isAdmin()) dans buildListItem() de index.js.
-                                           Seul l'admin voit les boutons, les autres utilisateurs ne les voient pas du tout. #}
-                                        {% if is_granted('ROLE_ADMIN') %}
-                                            <div class="task-actions">
-
-                                                {# Bouton MODIFIER → équivalent du lien MODIFY✎ dans index.js.
-                                                   Redirige vers la route task_edit avec l'id de la tâche en paramètre. #}
-                                                <a href="{{ path('task_edit', {id: task.id}) }}"
-                                                   class="btn-edit"
-                                                   title="Modifier la tâche">MODIFY ✎</a>
-
-                                                {# ── BOUTONS DE CHANGEMENT DE STATUT (← →) ──────────
-                                                   Équivalent de action-advance et action-rewind dans index.js.
-                                                   On calcule les mouvements précédent/suivant dans l'ordre logique.
-                                                   Twig n'a pas de indexOf(), donc on utilise une astuce avec un tableau. #}
-
-                                                {# Tableau ordonné des mouvements (du plus lent au plus rapide). #}
-                                                {% set movementOrder = ['andante', 'adagio', 'allegro', 'presto'] %}
-
-                                                {# Calcule l'index du mouvement actuel dans le tableau.
-                                                   |keys|filter → cherche la position de la valeur courante. #}
-                                                {% set currentIdx = movementOrder|keys|filter(k => movementOrder[k] == task.movement)|first %}
-
-                                                {# Bouton "Reculer" → équivalent de action-rewind.
-                                                   N'est affiché que si la tâche n'est pas déjà au premier statut (currentIdx > 0). #}
-                                                {% if currentIdx > 0 %}
-                                                    <a href="{{ path('task_change_status', {id: task.id, movement: movementOrder[currentIdx - 1]}) }}"
-                                                       class="btn-status"
-                                                       title="Reculer le statut">←</a>
-                                                {% endif %}
-
-                                                {# Bouton "Avancer" → équivalent de action-advance.
-                                                   N'est affiché que si la tâche n'est pas au dernier statut. #}
-                                                {% if currentIdx < (movementOrder|length - 1) %}
-                                                    <a href="{{ path('task_change_status', {id: task.id, movement: movementOrder[currentIdx + 1]}) }}"
-                                                       class="btn-status"
-                                                       title="Avancer le statut">→</a>
-                                                {% endif %}
-
-                                                {# Bouton SUPPRIMER → équivalent du bouton ✕ dans index.js.
-                                                   Disponible UNIQUEMENT pour l'admin (comme requireAdmin() + DELETE dans api.php).
-                                                   onclick="return confirm(...)" → confirmation native du navigateur. #}
-                                                <a href="{{ path('task_delete', {id: task.id}) }}"
-                                                   class="btn-delete"
-                                                   onclick="return confirm('Supprimer cette tâche ?')"
-                                                   title="Supprimer la tâche">✕</a>
-
-                                            </div>
-                                        {% endif %}
-                                        {# Fin de {% if is_granted('ROLE_ADMIN') %} #}
-
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-
-                {% endfor %}
-                {# Fin de la boucle sur les groupes #}
-
-            </div>
-            {# Fin .status-groups #}
-
-        {% endif %}
-        {# Fin du test tasks is empty #}
-
+    <div class="stat-box">
+        <h2>{{ activeCount }}</h2>
+        <p>Active Tasks</p>
     </div>
-    {# Fin .main #}
+
+    <div class="stat-box">
+        <h2>{{ urgentCount }}</h2>
+        <p>Urgent Tasks</p>
+    </div>
 
 </div>
-{# Fin .layout #}
+
+<div class="filter-select">
+
+<form method="GET">
+
+    <select name="group" onchange="this.form.submit()">
+
+        <option value="">All Groups</option>
+
+        {% for group in groups %}
+
+            <option
+                value="{{ group.id }}"
+                {% if selectedGroup == group.id %}
+                    selected
+                {% endif %}
+            >
+                {{ group.name }}
+            </option>
+
+        {% endfor %}
+
+    </select>
+
+</form>
+
+</div>
+        {% if tasks is empty %}
+
+    <div class="empty">
+        No tasks found
+    </div>
+
+{% else %}
+
+<table class="tasks-table">
+
+    <thead>
+        <tr>
+            <th>Task</th>
+            <th>Description</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Deadline</th>
+            <th>Actions</th>        
+            </tr>
+    </thead>
+
+    <tbody>
+
+    {% for task in tasks|reverse %}
+
+        <tr class="{% if task.status == 'done' %}completed-task{% endif %}">
+
+            <td>{{ task.title }}</td>
+
+            <td>
+                {% for tag in task.tags %}
+                    {{ tag }}
+                    {% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+
+            <td>
+
+                <span class="priority {{ task.priority }}">
+                    {{ task.priority }}
+                </span>
+
+            </td>
+
+ <td>
+
+    {% if task.status == 'done' %}
+
+        <span class="status status-done">
+            Done
+        </span>
+
+    {% else %}
+
+        <span class="status status-progress">
+            In Progress
+        </span>
+
+    {% endif %}
+
+</td>
+
+            <td>
+
+                {% if task.dueDate %}
+                    {{ task.dueDate }}
+                {% endif %}
+
+            </td>
+
+<td class="actions-col">
+
+    <div class="actions">
+
+        {# USER #}
+        {% if app.user and 'ROLE_USER' in app.user.roles and 'ROLE_ADMIN' not in app.user.roles %}
+
+            {% if task.status != 'done' %}
+
+                <a
+                    href="{{ path('task_complete', {id: task.id}) }}"
+                    class="btn-complete"
+                >
+                    ✓
+                </a>
+
+            {% else %}
+
+                <a
+                    href="{{ path('task_restore', {id: task.id}) }}"
+                    class="btn-restore"
+                >
+                    ↺
+                </a>
+
+            {% endif %}
+
+        {% endif %}
+
+        {# ADMIN #}
+        {% if app.user and 'ROLE_ADMIN' in app.user.roles %}
+
+            <a
+                href="{{ path('task_delete', {id: task.id}) }}"
+                class="btn-delete"
+                onclick="return confirm('Delete task ?')"
+            >
+                ✕
+            </a>
+
+        {% endif %}
+
+    </div>
+
+</td>
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endif %}
+    </div>
+
+</div>
 {% endblock %}
