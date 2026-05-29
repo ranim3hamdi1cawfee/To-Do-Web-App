@@ -1,8 +1,15 @@
 <?php
 
 session_start();
+<<<<<<< Updated upstream
 require_once __DIR__ . '/../add-task/db.php';
 require_once __DIR__ . '/../login_logic/auth_guard.php';
+=======
+
+require_once '../add-task/db.php';
+require_once '../login_logic/auth_guard.php';
+
+>>>>>>> Stashed changes
 // Vérifier que l'utilisateur est connecté
 requireLogin();
 
