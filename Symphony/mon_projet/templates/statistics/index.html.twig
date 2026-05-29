@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistics — TaskFlow{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/statistics.css') }}">
+{% endblock %}
+
+{% block body %}
+  <main>
+
+    <div class="ligne-principale">
+      <div class="periode-section">
+        <button class="btn-periode actif" onclick="changerPeriode('today', this)"><span class="periode-icon">◎</span>Today</button>
+        <button class="btn-periode" onclick="changerPeriode('week', this)"><span class="periode-icon">◫</span>This Week</button>
+        <button class="btn-periode" onclick="changerPeriode('month', this)"><span class="periode-icon">◳</span>This Month</button>
+        <button class="btn-periode" onclick="changerPeriode('year', this)"><span class="periode-icon">◈</span>This Year</button>
+      </div>
+
+      <div class="cartes-kpi">
+        <div class="kpi-card bleu">
+          <span class="kpi-valeur" id="kpi-total">0</span>
+          <span class="kpi-label">Total Tasks</span>
+        </div>
+        <div class="kpi-card vert">
+          <span class="kpi-valeur" id="kpi-faites">0</span>
+          <span class="kpi-label">Done</span>
+        </div>
+        <div class="kpi-card orange">
+          <span class="kpi-valeur" id="kpi-restantes">0</span>
+          <span class="kpi-label">Todo + Doing</span>
+        </div>
+        <div class="kpi-card rouge">
+          <span class="kpi-valeur" id="kpi-taux">0%</span>
+          <span class="kpi-label">Completion</span>
+        </div>
+      </div>
+    </div>
+    <div class="contexte-bandeau">
+      {% if role == 'Admin' %}
+        <span class="ctx-badge ctx-admin">Admin — Global Statistics</span>
+      {% else %}
+        <span class="ctx-badge ctx-regular">Regular — Group: {{ user_group_name ?: 'Not assigned' }}</span>
+      {% endif %}
+    </div>
+    <div class="section-barre">
+      <span class="barre-titre">Overall Progress</span>
+      <div class="barre-fond">
+        <div class="barre-remplie" id="barre-progress" style="width:0%"></div>
+      </div>
+      <div class="barre-legende">
+        <span id="legende-faites">0 Done</span>
+        <span class="barre-pct" id="legende-pct">0%</span>
+        <span id="legende-restantes">0 Todo/Doing</span>
+      </div>
+    </div>
+
+    <div class="section-graphique">
+      <div class="graphique-entete">
+        <span class="graphique-titre" id="titre-graphique">Tasks due today</span>
+        <div class="legende-graphique">
+          <div class="legende-item">
+            <div class="legende-couleur" style="background:#c8fb4b"></div>
+            <span>Done</span>
+          </div>
+          <div class="legende-item">
+            <div class="legende-couleur" style="background:#555;opacity:0.4"></div>
+            <span>Todo/Doing</span>
+          </div>
+        </div>
+      </div>
+      <div class="graphique-zone">
+        <div class="axe-y" id="axe-y"></div>
+        <div class="graphique" id="graphique"></div>
+      </div>
+    </div>
+
+  </main>
+{% endblock %}
+
+{% block javascripts %}
+  <script>
+    window.TACHES_PHP    = {{ taches_json|raw }};
+    window.USER_ROLE     = "{{ role }}";
+    window.USER_GROUP_ID = {{ user_group_id|json_encode }};
+  </script>
+  <script src="{{ asset('statistics.js') }}"></script>
+{% endblock %}
