@@ -1,4 +1,15 @@
 /* Reset layout pour prendre toute la page */
+:root {
+    --accent: #c8fb4b;
+    --surface: #111827;
+    --surface2: #1a1a2e;
+    --text: #e5e7eb;
+    --muted: #555;
+    --border: #1e1e1e;
+    --high: #ff5555;
+    --font-mono: 'DM Mono', monospace;
+    --font-head: 'Syne', sans-serif;
+}
 body {
   overflow-x: hidden;
 }
@@ -406,4 +417,18 @@ main {
   display: block;
   font-size: 1.1rem;
   margin-bottom: 4px;
+}
+
+/* Scrollbar personnalisée */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--surface2, #1a1a2e);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent, #c8fb4b);
+    border-radius: 99px;
 }
