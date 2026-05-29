@@ -23,17 +23,41 @@ class Task
     #[ORM\Column(type: 'string', length: 20)]
     private string $movement;
 
-    #[ORM\Column(type: 'json', columnDefinition: "LONGTEXT NOT NULL CHECK (json_valid(`tags`))")]
+    #[ORM\Column(type: 'json')]
     private array $tags = [];
 
-    #[ORM\Column(type: 'string', length: 20, nullable: true, columnDefinition: "VARCHAR(20) DEFAULT NULL")]
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
     private ?string $dueDate = null;
 
-    #[ORM\Column(type: 'integer', nullable: true, name: 'group_id')]
+    // ─────────────────────────────────────────────────────────────
+    //  COLONNE group_id — conservée pour compatibilité avec le projet PHP/JS.
+    //
+    //  'name: group_id' → dit à Doctrine que la colonne SQL s'appelle
+    //  'group_id' (snake_case) même si la propriété PHP s'appelle
+    //  '$groupId' (camelCase).
+    //  Sans ce 'name:', Doctrine cherche une colonne 'group_id' mais
+    //  ne reconnaît pas qu'elle correspond à '$groupId' → erreur de sync.
+    //
+    //  nullable: true → la colonne peut être NULL (tâches sans groupe).
+    //  Symfony ne l'utilise pas dans sa logique — juste déclarée pour
+    //  que Doctrine soit en sync avec la BDD existante.
+    // ─────────────────────────────────────────────────────────────
+    #[ORM\Column(name: 'group_id', type: 'integer', nullable: true)]
     private ?int $groupId = null;
 
-    #[ORM\Column(type: 'integer', nullable: true, name: 'created_by')]
-    private ?int $createdBy = null;
+    // ─────────────────────────────────────────────────────────────
+    //  RELATION ManyToOne → User
+    //
+    //  Une tâche appartient à UN seul utilisateur.
+    //  JoinColumn name: 'user_id' → colonne FK dans la table task.
+    //  onDelete: 'CASCADE' → si le user est supprimé, ses tâches aussi.
+    //  Correspond exactement à la contrainte fk_task_user en BDD.
+    // ─────────────────────────────────────────────────────────────
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    private User $user;
+
+    // ── GETTERS & SETTERS ────────────────────────────────────────
 
     public function getId(): ?int { return $this->id; }
 
@@ -52,11 +76,13 @@ class Task
     public function getDueDate(): ?string { return $this->dueDate; }
     public function setDueDate(?string $dueDate): self { $this->dueDate = $dueDate; return $this; }
 
+    // group_id → utilisé par le projet PHP/JS, ignoré par Symfony.
     public function getGroupId(): ?int { return $this->groupId; }
     public function setGroupId(?int $groupId): self { $this->groupId = $groupId; return $this; }
 
-    public function getCreatedBy(): ?int { return $this->createdBy; }
-    public function setCreatedBy(?int $createdBy): self { $this->createdBy = $createdBy; return $this; }
+    // User propriétaire de la tâche.
+    public function getUser(): User { return $this->user; }
+    public function setUser(User $user): self { $this->user = $user; return $this; }
 
     public function __toString(): string { return $this->title; }
 }

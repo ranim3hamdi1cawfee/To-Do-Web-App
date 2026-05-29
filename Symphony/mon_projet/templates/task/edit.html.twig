@@ -1,0 +1,102 @@
+{% extends 'base.html.twig' %}
+{% block title %}Modifier — {{ task.title }}{% endblock %}
+
+{% block body %}
+<div class="layout">
+
+    {# ── SIDEBAR : FORMULAIRE D'ÉDITION ───────────────────────── #}
+    <div class="sidebar">
+        <div class="sidebar-title">
+            {# On affiche le titre actuel dans l'en-tête pour rappeler quelle tâche on édite.
+               task.title appelle getTitle() via le mécanisme Twig → PHP getter. #}
+            Modifier : {{ task.title|slice(0, 20) }}{% if task.title|length > 20 %}…{% endif %}
+            <button class="btn-create" onclick="document.querySelector('form').submit()">✓ SAVE</button>
+        </div>
+
+        {# Même formulaire TaskType que pour la création.
+           Symfony pré-remplit les champs avec les valeurs actuelles de $task
+           car le contrôleur a fait createForm(TaskType::class, $task). #}
+        {{ form_start(form) }}
+
+            <div class="field">
+                {{ form_label(form.title) }}
+                {{ form_widget(form.title) }}
+            </div>
+
+            {# Champ tags pré-rempli avec les tags existants.
+               tags_default est passé par le contrôleur : implode(', ', $task->getTags()).
+               'value' dans 'attr' pré-remplit le champ input non-mappé. #}
+            <div class="field">
+                {{ form_label(form.tags) }}
+                {{ form_widget(form.tags, {'attr': {'value': tags_default}}) }}
+                <small style="color:#444; font-size:11px; margin-top:4px; display:block;">
+                    Tags actuels : {{ tags_default ?: '(aucun)' }}
+                </small>
+            </div>
+
+            <div class="field">
+                {{ form_label(form.priority) }}
+                {{ form_widget(form.priority) }}
+            </div>
+
+            {# Le champ movement est pré-sélectionné avec la valeur actuelle de la tâche.
+               Symfony gère ça automatiquement car le champ est mappé à Task::$movement. #}
+            <div class="field">
+                {{ form_label(form.movement) }}
+                {{ form_widget(form.movement) }}
+            </div>
+
+            <div class="field">
+                {{ form_label(form.dueDate) }}
+                {{ form_widget(form.dueDate) }}
+            </div>
+
+            {{ form_widget(form.save, {
+                'label': 'Enregistrer les modifications',
+                'attr': {'class': 'btn-submit'}
+            }) }}
+
+        {{ form_end(form) }}
+
+        {# Lien retour sans sauvegarder. #}
+        <a href="{{ path('task_list') }}"
+           style="display:block; text-align:center; margin-top:14px; color:#444; font-size:12px; text-decoration:none;">
+            ← Annuler
+        </a>
+    </div>
+
+    {# ── PANNEAU DROIT : APERÇU ACTUEL ─────────────────────────── #}
+    <div class="main" style="display:flex; align-items:flex-start; padding-top: 40px;">
+        <div style="width: 100%;">
+
+            {# Rappel visuel de la tâche en cours d'édition.
+               Même affichage qu'une task-item dans la liste. #}
+            <div style="font-size: 11px; color: #333; letter-spacing: 2px; margin-bottom: 16px;">ÉTAT ACTUEL</div>
+            <div class="task-item {{ task.priority }}" style="max-width: 500px;">
+                <div>
+                    <div class="task-name">{{ task.title }}</div>
+                    <div class="task-meta" style="margin-top:6px;">
+                        <span class="pill pill-green">{{ task.priority|upper }}</span>
+                        <span class="pill pill-blue">{{ task.movement }}</span>
+                        {# Boucle sur les tags actuels pour les afficher. #}
+                        {% for tag in task.getTags() %}
+                            <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                        {% if task.dueDate %}
+                            <span class="pill">📅 {{ task.dueDate }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# Note d'information rappelant que seuls les admins peuvent modifier.
+               Équivalent du message "Action réservée aux administrateurs" dans api.php. #}
+            <div style="margin-top: 24px; color: #333; font-size: 12px; letter-spacing: 1px;">
+                ★ ADMIN — Vous modifiez cette tâche en tant qu'administrateur.
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

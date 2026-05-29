@@ -1,27 +1,80 @@
+{# ═══════════════════════════════════════════════════════════════
+   add.html.twig — Formulaire de création de tâche
+   Accessible à tous les utilisateurs connectés (ROLE_USER).
+   Équivalent du formulaire dans le panel--create de index.html (version JS)
+   et du case 'POST' dans api.php.
+   ═══════════════════════════════════════════════════════════════ #}
 {% extends 'base.html.twig' %}
 {% block title %}New Task{% endblock %}
 
 {% block body %}
 <div class="layout">
 
+    {# ── SIDEBAR : FORMULAIRE DE CRÉATION ─────────────────────── #}
     <div class="sidebar">
         <div class="sidebar-title">
             New Task
+            {# Soumet le formulaire en JS pur → évite d'avoir deux boutons submit. #}
             <button class="btn-create" onclick="document.querySelector('form').submit()">+CREATE</button>
         </div>
 
+        {# form_start() → génère la balise <form method="POST" action="...">
+           Symfony gère automatiquement l'action (URL courante) et la méthode POST.
+           Il ajoute aussi un champ CSRF caché pour la sécurité (token anti-forgery). #}
         {{ form_start(form) }}
-            <div class="field">{{ form_label(form.title) }}{{ form_widget(form.title) }}</div>
-            <div class="field">{{ form_label(form.tags) }}{{ form_widget(form.tags) }}</div>
-            <div class="field">{{ form_label(form.priority) }}{{ form_widget(form.priority) }}</div>
-            <div class="field">{{ form_label(form.movement) }}{{ form_widget(form.movement) }}</div>
-            <div class="field">{{ form_label(form.dueDate) }}{{ form_widget(form.dueDate) }}</div>
+
+            {# form_label() → génère le <label for="..."> lié au champ.
+               form_widget() → génère le <input> ou <select> du champ.
+               On les entoure d'un <div class="field"> pour le style. #}
+
+            {# Champ titre → <input type="text"> lié à Task::$title #}
+            <div class="field">
+                {{ form_label(form.title) }}
+                {{ form_widget(form.title) }}
+            </div>
+
+            {# Champ tags → non-mappé, traité manuellement dans le contrôleur.
+               L'utilisateur tape "symfony, php, urgent" → le contrôleur split/trim. #}
+            <div class="field">
+                {{ form_label(form.tags) }}
+                {{ form_widget(form.tags) }}
+            </div>
+
+            {# Champ priorité → <select> avec les valeurs pp/p/mf/f/ff. #}
+            <div class="field">
+                {{ form_label(form.priority) }}
+                {{ form_widget(form.priority) }}
+            </div>
+
+            {# Champ mouvement → <select> avec andante/allegro/adagio/presto.
+               Équivalent du status 'todo/doing/done' de la version JS. #}
+            <div class="field">
+                {{ form_label(form.movement) }}
+                {{ form_widget(form.movement) }}
+            </div>
+
+            {# Champ date d'échéance → <input type="text"> format YYYY-MM-DD. #}
+            <div class="field">
+                {{ form_label(form.dueDate) }}
+                {{ form_widget(form.dueDate) }}
+            </div>
+
+            {# form_widget(form.save) → génère le bouton <button type="submit">.
+               On passe la classe CSS pour le styler avec .btn-submit. #}
             {{ form_widget(form.save, {'attr': {'class': 'btn-submit'}}) }}
+
+        {# form_end() → ferme la balise </form>.
+           Il affiche aussi les champs non rendus (notamment le token CSRF caché). #}
         {{ form_end(form) }}
 
-        <a href="{{ path('task_list') }}" style="display:block; text-align:center; margin-top:14px; color:#444; font-size:12px; text-decoration:none;">← Retour</a>
+        {# Lien retour vers la liste. #}
+        <a href="{{ path('task_list') }}"
+           style="display:block; text-align:center; margin-top:14px; color:#444; font-size:12px; text-decoration:none;">
+            ← Retour à la liste
+        </a>
     </div>
 
+    {# ── PANNEAU DROIT : DÉCORATIF ─────────────────────────────── #}
     <div class="main" style="display:flex; align-items:center; justify-content:center;">
         <div style="text-align:center; color:#222;">
             <div style="font-size:48px; margin-bottom:16px;">✦</div>

@@ -1,155 +1,267 @@
+{# ═══════════════════════════════════════════════════════════════
+   base.html.twig — Template de base (layout global)
+   Toutes les autres pages "étendent" ce fichier via {% extends %}.
+   C'est le principe d'héritage de templates Twig.
+   ═══════════════════════════════════════════════════════════════ #}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
+
+    {# {% block title %} définit un bloc que les templates enfants peuvent surcharger.
+       TaskFlow est la valeur par défaut si l'enfant ne redéfinit pas le bloc. #}
     <title>{% block title %}TaskFlow{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
     <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; } [cite: 1, 2]
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Courier New', monospace; [cite: 2]
-            background: #0a0a0a; [cite: 3]
-            color: #ccc; [cite: 3]
-            min-height: 100vh; [cite: 3]
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #ccc;
+            min-height: 100vh;
         }
 
-        /* LAYOUT CONTAINER */
+        /* ── HEADER ── */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 32px;
+            border-bottom: 1px solid #1e1e1e;
+        }
+        .header-left { display: flex; align-items: center; gap: 14px; }
+        .logo-box {
+            background: #c8ff00;
+            color: #000;
+            font-weight: 900;
+            font-size: 14px;
+            width: 42px; height: 42px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px;
+        }
+        .logo-title { font-size: 22px; font-weight: 700; color: #fff; }
+
+        {# Le badge de rôle affiché dans le header (USER / ADMIN) #}
+        .logo-sub { font-size: 12px; color: #c8ff00; margin-top: 2px; }
+        .role-badge {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            border: 1px solid #333;
+        }
+        /* Badge vert pour Admin, gris pour User */
+        .role-admin { border-color: #c8ff0044; color: #c8ff00; background: #c8ff0011; }
+        .role-user  { border-color: #3333333; color: #666; }
+
+        .header-right { display: flex; gap: 12px; align-items: center; }
+        .badge-btn {
+            display: flex; align-items: center; gap: 7px;
+            border: 1px solid #333;
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #aaa;
+            text-decoration: none;
+        }
+        .badge-btn .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .dot-green { background: #c8ff00; }
+        .dot-red   { background: #ff4444; }
+
+        /* ── LAYOUT PRINCIPAL : 2 colonnes ── */
         .layout {
-            display: grid; [cite: 3]
-            grid-template-columns: 400px 1fr; /* Sidebar, Main Content */ 
-            min-height: calc(100vh - 70px); 
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            min-height: calc(100vh - 73px);
         }
 
-        /* SIDEBAR styles */
-        .sidebar { border-right: 1px solid #1e1e1e; padding: 28px; } [cite: 4, 5]
+        /* ── SIDEBAR (panneau gauche) ── */
+        .sidebar { border-right: 1px solid #1e1e1e; padding: 28px; }
         .sidebar-title {
-            font-size: 18px; [cite: 5]
-            font-weight: 700; color: #fff; [cite: 6]
-            margin-bottom: 24px; [cite: 6]
-            display: flex; justify-content: space-between; align-items: center; [cite: 6]
+            font-size: 18px; font-weight: 700; color: #fff;
+            margin-bottom: 24px;
+            display: flex; justify-content: space-between; align-items: center;
         }
         .btn-create {
-            background: #1a1a1a; [cite: 7]
-            border: 1px solid #333; color: #aaa; [cite: 8]
-            padding: 6px 14px; border-radius: 6px; font-size: 12px; [cite: 8]
-            font-family: 'Courier New', monospace; cursor: pointer; [cite: 8]
-            letter-spacing: 1px; [cite: 9]
+            background: #1a1a1a; border: 1px solid #333; color: #aaa;
+            padding: 6px 14px; border-radius: 6px; font-size: 12px;
+            font-family: 'Courier New', monospace; cursor: pointer; letter-spacing: 1px;
+            text-decoration: none;
         }
-        .btn-create:hover { border-color: #c8ff00; color: #c8ff00; } [cite: 10]
+        .btn-create:hover { border-color: #c8ff00; color: #c8ff00; }
 
-        /* FORM fields */
-        .field { margin-bottom: 20px; } [cite: 10, 11]
+        /* ── FORMULAIRE ── */
+        .field { margin-bottom: 20px; }
         .field label {
-            display: block; [cite: 11]
-            font-size: 11px; font-weight: 700; [cite: 12]
-            letter-spacing: 1.5px; color: #555; margin-bottom: 8px; text-transform: uppercase; [cite: 12]
+            display: block; font-size: 11px; font-weight: 700;
+            letter-spacing: 1.5px; color: #555; margin-bottom: 8px; text-transform: uppercase;
         }
         .field input, .field select {
-            width: 100%; [cite: 13]
-            background: #111; border: 1px solid #222; [cite: 14]
-            border-radius: 8px; padding: 12px 14px; color: #ccc; [cite: 14]
-            font-family: 'Courier New', monospace; font-size: 13px; [cite: 14]
-            transition: border-color 0.2s; [cite: 15]
+            width: 100%; background: #111; border: 1px solid #222;
+            border-radius: 8px; padding: 12px 14px; color: #ccc;
+            font-family: 'Courier New', monospace; font-size: 13px; transition: border-color 0.2s;
         }
-        .field input::placeholder { color: #444; } [cite: 15, 16]
-        .field input:focus, .field select:focus { outline: none; border-color: #c8ff00; } [cite: 16, 17]
-        .field select option { background: #111; } [cite: 17, 18]
-
-        /* PRIORITIES */
-        .priority-group { display: flex; gap: 10px; } [cite: 18, 19]
-        .priority-btn {
-            flex: 1; [cite: 19]
-            background: #111; border: 1px solid #222; border-radius: 8px; [cite: 20]
-            padding: 14px 10px; color: #555; font-family: 'Courier New', monospace; [cite: 20]
-            font-size: 11px; [cite: 20]
-            font-weight: 700; letter-spacing: 1px; cursor: pointer; [cite: 21]
-            text-align: center; transition: all 0.2s; [cite: 21]
-        }
-        .priority-btn:hover { border-color: #c8ff00; color: #c8ff00; } [cite: 22]
-        .priority-btn .icon { font-size: 16px; display: block; margin-bottom: 6px; } [cite: 23]
+        .field input::placeholder { color: #444; }
+        .field input:focus, .field select:focus { outline: none; border-color: #c8ff00; }
+        .field select option { background: #111; }
 
         .btn-submit {
-            width: 100%; [cite: 24]
-            background: #c8ff00; color: #000; border: none; [cite: 25]
-            border-radius: 8px; padding: 14px; font-family: 'Courier New', monospace; [cite: 25]
-            font-size: 13px; font-weight: 900; letter-spacing: 2px; [cite: 25]
-            cursor: pointer; margin-top: 8px; transition: background 0.2s; [cite: 26]
+            width: 100%; background: #c8ff00; color: #000; border: none;
+            border-radius: 8px; padding: 14px; font-family: 'Courier New', monospace;
+            font-size: 13px; font-weight: 900; letter-spacing: 2px; cursor: pointer;
+            margin-top: 8px; transition: background 0.2s;
         }
-        .btn-submit:hover { background: #b8ef00; } [cite: 26, 27]
+        .btn-submit:hover { background: #b8ef00; }
 
-        /* MAIN APP STYLES */
-        .main { padding: 28px 32px; } [cite: 27, 28]
+        /* ── MAIN (panneau droit) ── */
+        .main { padding: 28px 32px; }
         .main-header {
-            display: flex; [cite: 28]
-            justify-content: space-between; [cite: 29]
-            align-items: center; margin-bottom: 24px; [cite: 29]
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
         }
-        .main-title { font-size: 18px; font-weight: 700; color: #fff; } [cite: 29, 30]
+        .main-title { font-size: 18px; font-weight: 700; color: #fff; }
 
-        /* TASK RENDER styles */
-        .task-list { list-style: none; display: flex; flex-direction: column; gap: 10px; } [cite: 30, 31]
+        /* ── LISTE DE TÂCHES ── */
+        .task-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
         .task-item {
-            background: #111; [cite: 31]
-            border: 1px solid #1e1e1e; border-radius: 10px; [cite: 32]
-            padding: 16px 20px; display: flex; justify-content: space-between; [cite: 32]
-            align-items: center; transition: border-color 0.2s; [cite: 32]
+            background: #111; border: 1px solid #1e1e1e; border-radius: 10px;
+            padding: 16px 20px; display: flex; justify-content: space-between;
+            align-items: center; transition: border-color 0.2s;
         }
-        .task-item:hover { border-color: #333; } [cite: 33, 34]
-        .task-item.ff { border-left: 3px solid #ff4444; } [cite: 34, 35]
-        .task-item.f  { border-left: 3px solid #f97316; } [cite: 35, 36]
-        .task-item.mf { border-left: 3px solid #c8ff00; } [cite: 36, 37]
-        .task-item.p  { border-left: 3px solid #34d399; } [cite: 37, 38]
-        .task-item.pp { border-left: 3px solid #60a5fa; } [cite: 38, 39]
+        .task-item:hover { border-color: #333; }
 
-        .task-name { font-size: 14px; font-weight: 600; color: #e0e0e0; margin-bottom: 6px; } [cite: 39, 40]
-        .task-meta { display: flex; gap: 8px; flex-wrap: wrap; } [cite: 40, 41]
+        /* Bordure gauche colorée selon la priorité (même logique que priority-border- dans la version JS) */
+        .task-item.ff { border-left: 3px solid #ff4444; }
+        .task-item.f  { border-left: 3px solid #f97316; }
+        .task-item.mf { border-left: 3px solid #c8ff00; }
+        .task-item.p  { border-left: 3px solid #34d399; }
+        .task-item.pp { border-left: 3px solid #60a5fa; }
+
+        .task-name { font-size: 14px; font-weight: 600; color: #e0e0e0; margin-bottom: 6px; }
+        .task-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
         .pill {
-            padding: 3px 10px; [cite: 41, 42]
-            border-radius: 20px; font-size: 11px; [cite: 42]
-            font-weight: 700; letter-spacing: .5px; border: 1px solid #333; color: #777; [cite: 42, 43]
+            padding: 3px 10px; border-radius: 20px; font-size: 11px;
+            font-weight: 700; letter-spacing: .5px; border: 1px solid #333; color: #777;
         }
-        .pill-green { border-color: #c8ff0044; color: #c8ff00; background: #c8ff0011; } [cite: 43, 44]
-        .pill-red   { border-color: #ff444444; color: #ff6666; background: #ff444411; } [cite: 44, 45]
+        .pill-green { border-color: #c8ff0044; color: #c8ff00; background: #c8ff0011; }
+        .pill-red   { border-color: #ff444444; color: #ff6666; background: #ff444411; }
+        .pill-blue  { border-color: #60a5fa44; color: #60a5fa; background: #60a5fa11; }
 
         .tag {
-            background: #1a1500; [cite: 45, 46]
-            border: 1px solid #3a2f00; [cite: 46]
-            color: #c8a800; padding: 2px 8px; border-radius: 4px; font-size: 11px; [cite: 46, 47]
+            background: #1a1500; border: 1px solid #3a2f00;
+            color: #c8a800; padding: 2px 8px; border-radius: 4px; font-size: 11px;
         }
 
+        /* ── BOUTONS D'ACTION (admin only) ── */
+        .task-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
+        /* Bouton modifier → style identique au MODIFY✎ de index.js */
+        .btn-edit {
+            background: none; border: 1px solid #2a2a2a; color: #888;
+            padding: 5px 10px; border-radius: 6px; font-size: 11px;
+            cursor: pointer; text-decoration: none; font-family: 'Courier New', monospace;
+            transition: all 0.2s; white-space: nowrap; letter-spacing: .5px;
+        }
+        .btn-edit:hover { border-color: #c8ff00; color: #c8ff00; }
+
+        /* Bouton statut (← →) → équivalent de action-advance / action-rewind */
+        .btn-status {
+            background: none; border: 1px solid #2a2a2a; color: #555;
+            padding: 5px 10px; border-radius: 6px; font-size: 13px;
+            cursor: pointer; text-decoration: none; font-family: 'Courier New', monospace;
+            transition: all 0.2s;
+        }
+        .btn-status:hover { border-color: #888; color: #ccc; }
+
+        /* Bouton supprimer → rouge au hover, même que btn-delete dans la version JS */
         .btn-delete {
-            background: none; [cite: 47, 48]
-            border: 1px solid #2a2a2a; color: #555; [cite: 48]
-            padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; [cite: 48]
-            text-decoration: none; [cite: 48, 49]
-            font-family: 'Courier New', monospace; [cite: 49]
-            transition: all 0.2s; white-space: nowrap; [cite: 49]
+            background: none; border: 1px solid #2a2a2a; color: #555;
+            padding: 5px 12px; border-radius: 6px; font-size: 12px;
+            cursor: pointer; text-decoration: none; font-family: 'Courier New', monospace;
+            transition: all 0.2s; white-space: nowrap;
         }
-        .btn-delete:hover { border-color: #ff4444; color: #ff4444; } [cite: 49, 50]
+        .btn-delete:hover { border-color: #ff4444; color: #ff4444; }
 
+        /* ── ÉTAT VIDE ── */
         .empty {
-            border: 1.5px dashed #1e1e1e; [cite: 50, 51]
-            border-radius: 10px; [cite: 51]
-            padding: 80px 20px; text-align: center; color: #333; font-size: 14px; [cite: 51, 52]
+            border: 1.5px dashed #1e1e1e; border-radius: 10px;
+            padding: 80px 20px; text-align: center; color: #333; font-size: 14px;
         }
 
-        .flash {
-            background: #0d1f00; [cite: 52, 53]
-            border: 1px solid #c8ff0033; color: #c8ff00; [cite: 53]
-            padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; [cite: 53, 54]
+        /* ── MESSAGES FLASH ── */
+        /* Équivalent des toasts dans index.js : notification temporaire de succès/erreur */
+        .flash-success {
+            background: #0d1f00; border: 1px solid #c8ff0033; color: #c8ff00;
+            padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 13px;
+        }
+        .flash-error {
+            background: #1f0000; border: 1px solid #ff444433; color: #ff6666;
+            padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 13px;
+        }
+
+        /* ── GROUPES DE STATUT (colonnes) ── */
+        .status-groups { display: flex; flex-direction: column; gap: 24px; }
+        .status-group-header {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+        }
+        .status-group-title { font-size: 12px; font-weight: 700; letter-spacing: 2px; color: #555; text-transform: uppercase; }
+        .status-group-count {
+            background: #1a1a1a; border: 1px solid #222;
+            border-radius: 20px; padding: 1px 8px; font-size: 11px; color: #555;
         }
     </style>
-    {% block stylesheets %}{% endblock %} 
 </head>
 <body>
 
-    {% include 'partials/navbar.html.twig' %} 
+{# ── HEADER GLOBAL ─────────────────────────────────────────────
+   is_granted('ROLE_ADMIN') est une fonction Twig fournie par
+   Symfony Security. Elle retourne true/false selon le rôle
+   de l'utilisateur connecté.
+   Équivalent de isAdmin() dans index.js (qui lisait window.currentUser.role).
+   ────────────────────────────────────────────────────────────── #}
+<div class="header">
+    <div class="header-left">
+        <div class="logo-box">TF</div>
+        <div>
+            <div class="logo-title">TaskFlow</div>
+            {# app.user est l'objet utilisateur Symfony (null si non connecté).
+               app.user.userIdentifier → retourne l'email ou le username selon la config Security. #}
+            {% if app.user %}
+                <div class="logo-sub">● {{ app.user.userIdentifier }}</div>
+            {% else %}
+                <div class="logo-sub">● Planning Mode</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="header-right">
+        {# Affiche le badge de rôle ADMIN (jaune) ou USER (gris).
+           Même logique que la version JS qui affichait le rôle dans l'UI. #}
+        {% if is_granted('ROLE_ADMIN') %}
+            <span class="role-badge role-admin">★ ADMIN</span>
+        {% elseif app.user %}
+            <span class="role-badge role-user">USER</span>
+        {% endif %}
 
-    {% block body %}{% endblock %} 
+        {# Bouton de déconnexion → route Symfony Security (/logout configurée dans security.yaml) #}
+        {% if app.user %}
+            <a href="{{ path('app_logout') }}" class="badge-btn" style="color:#ff6666; border-color:#ff444433;">
+                <span class="dot dot-red"></span> LOGOUT
+            </a>
+        {% else %}
+            <a href="{{ path('app_login') }}" class="badge-btn">
+                <span class="dot dot-green"></span> LOGIN
+            </a>
+        {% endif %}
+    </div>
+</div>
 
-    {% block javascripts %}{% endblock %} 
+{# {% block body %} est le bloc principal que chaque page enfant remplit.
+   C'est ici que le contenu spécifique de chaque page est injecté. #}
+{% block body %}{% endblock %}
+
 </body>
 </html>
