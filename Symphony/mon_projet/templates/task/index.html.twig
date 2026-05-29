@@ -169,6 +169,9 @@
     >
         ✕
     </a>
+    {% if app.user %}
+        <a href="{{ path('task_modify', {id: task.id}) }}" class="btn-modify">✎</a>
+    {% endif %}
 
 {% endif %}
 
