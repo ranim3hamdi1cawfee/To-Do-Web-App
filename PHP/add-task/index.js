@@ -130,52 +130,12 @@ function renderList() {
             if (rewindBtn)  rewindBtn.addEventListener('click',  () => changeStatus(task.id, 'rewind'));
             if (deleteBtn)  deleteBtn.addEventListener('click',  () => deleteTask(task.id));
         });
-        if (isAdmin()) initDragDrop();
     }
     const active = tasks.filter(t => t.status !== 'done').length;
     const urgent = tasks.filter(t => t.priority === 'high' && t.status !== 'done').length;
     activeCount.textContent = active;
     urgentCount.textContent = urgent;
 }
-
-// Drag & drop (identique)
-let draggedId = null;
-function initDragDrop() {
-    document.querySelectorAll('.list-card').forEach(card => {
-        card.setAttribute('draggable', 'true');
-        card.addEventListener('dragstart', e => {
-            draggedId = card.dataset.id;
-            card.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-        });
-        card.addEventListener('dragend', () => {
-            card.classList.remove('dragging');
-            document.querySelectorAll('.status-group-body').forEach(z => z.classList.remove('drag-over'));
-        });
-    });
-    document.querySelectorAll('.status-group-body').forEach(zone => {
-        zone.addEventListener('dragover', e => {
-            e.preventDefault();
-            zone.classList.add('drag-over');
-        });
-        zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-        zone.addEventListener('drop', async e => {
-            e.preventDefault();
-            zone.classList.remove('drag-over');
-            const newStatus = zone.dataset.status;
-            const task = tasks.find(t => t.id === draggedId);
-            if (!task || task.status === newStatus) return;
-            try {
-                const data = await apiPut(draggedId, { status: newStatus });
-                const index = tasks.findIndex(t => t.id === draggedId);
-                if (index !== -1) tasks[index] = data.task;
-                renderList();
-                toast(newStatus === 'done' ? '🎉 Tâche terminée !' : 'Statut mis à jour.', 'success');
-            } catch (err) { toast(err.message, 'error'); }
-        });
-    });
-}
-
 function buildListItem(task) {
     const idx        = statusOrder.indexOf(task.status);
     const canAdvance = idx < statusOrder.length - 1;
