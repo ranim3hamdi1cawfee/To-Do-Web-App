@@ -35,29 +35,29 @@ function requireAdmin(): void
 }
 
 const STATUS_TO_MOVEMENT = [
-    'todo'  => 'andante',
+    'todo' => 'andante',
     'doing' => 'moderato',
-    'done'  => 'allegro',
+    'done' => 'allegro',
 ];
 const MOVEMENT_TO_STATUS = [
-    'andante'  => 'todo',
+    'andante' => 'todo',
     'moderato' => 'doing',
-    'allegro'  => 'done',
+    'allegro' => 'done',
 ];
 
 function normalizeTask(array $row): array
 {
-    $tags        = $row['tags'] ?? '[]';
+    $tags = $row['tags'] ?? '[]';
     $tagsDecoded = json_decode($tags, true);
     $description = is_array($tagsDecoded) ? implode(', ', $tagsDecoded) : ($tags ?? '');
     return [
-        'id'          => (string) $row['id'],
-        'title'       => $row['title'],
+        'id' => (string) $row['id'],
+        'title' => $row['title'],
         'description' => $description,
-        'priority'    => $row['priority'] ?? 'medium',
-        'status'      => MOVEMENT_TO_STATUS[$row['movement']] ?? 'todo',
-        'due_date'    => $row['due_date'] ?? null,
-        'created_by'  => 'system',
+        'priority' => $row['priority'] ?? 'medium',
+        'status' => MOVEMENT_TO_STATUS[$row['movement']] ?? 'todo',
+        'due_date' => $row['due_date'] ?? null,
+        'created_by' => 'system',
     ];
 }
 
@@ -71,37 +71,78 @@ function getUserGroupId(PDO $db): int
 }
 
 $method = $_SERVER['REQUEST_METHOD'];
-$id     = $_GET['id'] ?? null;
-$body   = json_decode(file_get_contents('php://input'), true) ?? [];
+$id = $_GET['id'] ?? null;
+$body = json_decode(file_get_contents('php://input'), true) ?? [];
 
 switch ($method) {
 
     case 'GET':
         requireLogin();
-        $db        = getDB();
-        $userGroup = getUserGroupId($db); // ex: ranim → 1
 
-        // Filtre par group_id → chaque user voit seulement les tâches de son groupe
-        $sql    = 'SELECT * FROM task WHERE group_id = :group_id';
-        $params = [':group_id' => $userGroup];
+        $db = getDB();
+
+        // ADMIN
+        if ($_SESSION['role'] === 'Admin') {
+
+            // Filter par groupe
+            if (!empty($_GET['group'])) {
+
+                $sql = 'SELECT * FROM task WHERE group_id = :group_id';
+
+                $params = [
+                    ':group_id' => $_GET['group']
+                ];
+
+            } else {
+
+                // All Groups
+                $sql = 'SELECT * FROM task';
+
+                $params = [];
+            }
+
+        } else {
+
+            // USER NORMAL
+            $userGroup = getUserGroupId($db);
+
+            $sql = 'SELECT * FROM task WHERE group_id = :group_id';
+
+            $params = [
+                ':group_id' => $userGroup
+            ];
+        }
 
         if (!empty($_GET['status'])) {
+
             $movement = STATUS_TO_MOVEMENT[$_GET['status']] ?? $_GET['status'];
-            $sql .= ' AND movement = :movement';
+
+            $sql .= isset($params[':group_id'])
+                ? ' AND movement = :movement'
+                : ' WHERE movement = :movement';
+
             $params[':movement'] = $movement;
         }
+
         $sql .= ' ORDER BY id DESC';
+
         $stmt = $db->prepare($sql);
+
         $stmt->execute($params);
+
         $tasks = array_map('normalizeTask', $stmt->fetchAll());
-        respond(200, ['success' => true, 'tasks' => $tasks]);
+
+        respond(200, [
+            'success' => true,
+            'tasks' => $tasks
+        ]);
 
     case 'POST':
         requireLogin();
         if (empty($body['title']))
             respond(422, ['success' => false, 'error' => 'Titre obligatoire.']);
 
-        $db        = getDB();
+        $db = getDB();
         $userGroup = getUserGroupId($db); // récupère le groupe du user connecté
 
         $stmt = $db->prepare(
@@ -109,12 +150,12 @@ switch ($method) {
              VALUES (:title, :priority, :movement, :due, :tags, :user_id, :group_id)'
         );
         $stmt->execute([
-            ':title'    => trim($body['title']),
+            ':title' => trim($body['title']),
             ':priority' => $body['priority'] ?? 'medium',
             ':movement' => 'andante',
-            ':due'      => !empty($body['due']) ? $body['due'] : null,
-            ':tags'     => json_encode($body['desc'] ? [$body['desc']] : []),
-            ':user_id'  => $_SESSION['user_id'],
+            ':due' => !empty($body['due']) ? $body['due'] : null,
+            ':tags' => json_encode($body['desc'] ? [$body['desc']] : []),
+            ':user_id' => $_SESSION['user_id'],
             ':group_id' => $userGroup, // lie la tâche au groupe du user
         ]);
 
@@ -128,8 +169,8 @@ switch ($method) {
         if (!$id)
             respond(400, ['success' => false, 'error' => 'id manquant.']);
 
-        $db     = getDB();
-        $sets   = [];
+        $db = getDB();
+        $sets = [];
         $params = [':id' => $id];
 
         if (array_key_exists('title', $body)) {
@@ -162,7 +203,7 @@ switch ($method) {
         if (!$id)
             respond(400, ['success' => false, 'error' => 'id manquant.']);
 
-        $db   = getDB();
+        $db = getDB();
         $stmt = $db->prepare('DELETE FROM task WHERE id = :id');
         $stmt->execute([':id' => $id]);
 

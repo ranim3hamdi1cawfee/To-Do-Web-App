@@ -41,32 +41,34 @@ if (!isset($_SESSION['user_id'])) {
                 <span class="stat-label">Urgent</span>
             </div>
         </div>
-        <div style="margin-bottom:20px;">
-            <select id="group-filter">
-                <option value="">
-                    All Groups
-                </option>
-                <option value="1">
-                    Development Alpha
-                </option>
+        <?php if ($_SESSION['role'] === 'Admin'): ?>
+            <div style="margin-bottom:20px;">
+                <select id="group-filter">
+                    <option value="">
+                        All Groups
+                    </option>
+                    <option value="1">
+                        Development Alpha
+                    </option>
 
-                <option value="2">
-                    UI/UX Design Team
-                </option>
+                    <option value="2">
+                        UI/UX Design Team
+                    </option>
 
-                <option value="3">
-                    QA Testing Squad
-                </option>
+                    <option value="3">
+                        QA Testing Squad
+                    </option>
 
-                <option value="4">
-                    Backend Team
-                </option>
+                    <option value="4">
+                        Backend Team
+                    </option>
 
-                <option value="5">
-                    DevOps
-                </option>
-        </div>
-        </select>
+                    <option value="5">
+                        DevOps
+                    </option>
+                </select>
+            </div>
+        <?php endif; ?>
         <table>
             <thead>
                 <tr>
@@ -89,7 +91,7 @@ if (!isset($_SESSION['user_id'])) {
     <script>
         window.loadTasks = async function () {
             try {
-                const group = document.getElementById("group-filter").value;
+                const group = document.getElementById("group-filter")?.value || "";
                 const response = await fetch("../add-task/api.php?group=" + group,
                     {
                         credentials: "include"
@@ -137,7 +139,10 @@ if (!isset($_SESSION['user_id'])) {
         }
 
         loadTasks();
-        document.getElementById("group-filter").addEventListener("change", loadTasks);
+        const groupFilter = document.getElementById("group-filter");
+        if (groupFilter) {
+            groupFilter.addEventListener("change", loadTasks);
+        }
     </script>
 
     <script src="index.js"></script>
