@@ -1,0 +1,162 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Task — TaskFlow{% endblock %}
+
+{% block body %}
+<div class="layout">
+
+
+    {# ------- SIDEBAR : FORMULAIRE DE MODIFICATION -------- #}
+    <div class="sidebar">
+
+        <div class="sidebar-title">
+            ✎ Edit Task
+            <span style="font-size:11px; color:#666;">#{{ task.id }}</span>
+        </div>
+
+
+        {# Badge admin / user (juste informatif) #}
+        <p style="margin: 8px 0 16px; font-size: 11px; color: #c8ff00; letter-spacing: 1px;">
+            {% if is_granted('ROLE_ADMIN') %}
+                ADMIN — tous les champs modifiables
+            {% else %}
+                USER — uniquement le rythme (movement)
+            {% endif %}
+        </p>
+
+
+        {# Messages flash (erreurs) #}
+        {% for message in app.flashes('error') %}
+            <div class="flash" style="background:#1f0000; border-color:#ff444433; color:#ff4444;">
+                ✕ {{ message }}
+            </div>
+        {% endfor %}
+
+        {#
+           ----- FORMULAIRE ------        #}
+        <form method="POST" action="" class="modify-form">
+
+
+            {#  TITLE  #}
+            <div class="field">
+                <label>Title</label>
+                <input
+                    class="input"
+                    type="text"
+                    name="title"
+                    value="{{ task.title }}"
+                    maxlength="200"
+                    required
+                    {% if not is_granted('ROLE_ADMIN') %}readonly{% endif %}>
+            </div>
+
+
+            {# TAGS }
+
+            <div class="field">
+                <label>Tags (séparés par virgules)</label>
+                <input
+                    class="input"
+                    type="text"
+                    name="tags"
+                    value="{{ task.tags|join(', ') }}"
+                    placeholder="symfony, php, urgent"
+                    {% if not is_granted('ROLE_ADMIN') %}readonly{% endif %}>
+            </div>
+
+
+            {#PRIORITY (musical : pp, p, mf, f, ff)#}
+            <div class="field">
+                <label>Priority</label>
+                <select
+                    class="input"
+                    name="priority"
+                    {% if not is_granted('ROLE_ADMIN') %}disabled{% endif %}>
+                    <option value="pp" {% if task.priority == 'pp' %}selected{% endif %}>Pianissimo (pp)</option>
+                    <option value="p"  {% if task.priority == 'p'  %}selected{% endif %}>Piano (p)</option>
+                    <option value="mf" {% if task.priority == 'mf' %}selected{% endif %}>Mezzo-forte (mf)</option>
+                    <option value="f"  {% if task.priority == 'f'  %}selected{% endif %}>Forte (f)</option>
+                    <option value="ff" {% if task.priority == 'ff' %}selected{% endif %}>Fortissimo (ff)</option>
+                </select>
+            </div>
+
+
+            {#  MOVEMENT (allegro, andante, adagio, presto) 
+               Toujours modifiable, même pour les Regular users.
+            #}
+            <div class="field">
+                <label>Movement (Rythme)</label>
+                <select class="input" name="movement">
+                    <option value="allegro" {% if task.movement == 'allegro' %}selected{% endif %}>Allegro</option>
+                    <option value="andante" {% if task.movement == 'andante' %}selected{% endif %}>Andante</option>
+                    <option value="adagio"  {% if task.movement == 'adagio'  %}selected{% endif %}>Adagio</option>
+                    <option value="presto"  {% if task.movement == 'presto'  %}selected{% endif %}>Presto</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Due Date</label>
+                <input
+                    class="input"
+                    type="date"
+                    name="due_date"
+                    value="{{ task.dueDate }}"
+                    {% if not is_granted('ROLE_ADMIN') %}readonly{% endif %}>
+            </div>
+
+
+            <button type="submit" class="btn-submit">
+                Save Changes
+            </button>
+
+
+        </form>
+
+
+        <a href="{{ path('task_list') }}"
+           style="display:block; text-align:center; margin-top:14px; color:#444; font-size:12px; text-decoration:none;">
+            ← Retour à la liste
+        </a>
+
+    </div>
+
+
+    <div class="main">
+
+        {% for message in app.flashes('success') %}
+            <div class="flash">✓ {{ message }}</div>
+        {% endfor %}
+
+
+        <div class="main-header">
+            <div class="main-title">Preview</div>
+            <span style="color:#444; font-size:12px; letter-spacing:1px;">CURRENT VALUES</span>
+        </div>
+        {# Aperçu de la tâche telle qu'elle est actuellement #}
+        <ul class="task-list">
+            <li class="task-item {{ task.priority }}">
+                <div>
+                    <div class="task-name">{{ task.title }}</div>
+                    <div class="task-meta">
+                        <span class="pill pill-green">{{ task.priority|upper }}</span>
+                        <span class="pill">{{ task.movement }}</span>
+                        {% for tag in task.tags %}
+                            <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                        {% if task.dueDate %}
+                            <span class="pill">📅 {{ task.dueDate }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+        <p style="margin-top: 30px; color:#444; font-size:12px; text-align:center;">
+            Modifie les champs à gauche et clique sur "Save Changes".
+        </p>
+
+    </div>
+
+
+</div>
+{% endblock %}
