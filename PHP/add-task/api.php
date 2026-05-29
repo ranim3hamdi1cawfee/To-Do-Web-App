@@ -61,6 +61,15 @@ function normalizeTask(array $row): array
     ];
 }
 
+// ── Fonction utilitaire : récupère le group_id de l'user connecté ─────────────
+// Utilisée dans GET et POST pour filtrer/assigner les tâches au bon groupe
+function getUserGroupId(PDO $db): int
+{
+    $stmt = $db->prepare('SELECT group_id FROM user WHERE id = :id');
+    $stmt->execute([':id' => $_SESSION['user_id']]);
+    return (int) $stmt->fetchColumn();
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
 $id     = $_GET['id'] ?? null;
 $body   = json_decode(file_get_contents('php://input'), true) ?? [];
@@ -69,18 +78,13 @@ switch ($method) {
 
     case 'GET':
         requireLogin();
-        $db  = getDB();
+        $db        = getDB();
+        $userGroup = getUserGroupId($db); // ex: ranim → 1
 
-        // ── CHANGEMENT : filtre par user_id connecté ──────────────────────
-        // Chaque user ne voit QUE ses propres tâches
-        // $_SESSION['user_id'] est défini lors du login
-        $sql    = 'SELECT * FROM task WHERE user_id = :user_id';
-        $params = [':user_id' => $_SESSION['user_id']];
+        // Filtre par group_id → chaque user voit seulement les tâches de son groupe
+        $sql    = 'SELECT * FROM task WHERE group_id = :group_id';
+        $params = [':group_id' => $userGroup];
 
-        if (!empty($_GET['group'])) {
-            $sql .= ' AND group_id = :group';
-            $params[':group'] = $_GET['group'];
-        }
         if (!empty($_GET['status'])) {
             $movement = STATUS_TO_MOVEMENT[$_GET['status']] ?? $_GET['status'];
             $sql .= ' AND movement = :movement';
@@ -97,13 +101,12 @@ switch ($method) {
         if (empty($body['title']))
             respond(422, ['success' => false, 'error' => 'Titre obligatoire.']);
 
-        $db   = getDB();
+        $db        = getDB();
+        $userGroup = getUserGroupId($db); // récupère le groupe du user connecté
 
-        // ── CHANGEMENT : on insère aussi user_id dans la tâche ────────────
-        // La tâche est liée à l'utilisateur qui la crée
         $stmt = $db->prepare(
-            'INSERT INTO task (title, priority, movement, due_date, tags, user_id)
-             VALUES (:title, :priority, :movement, :due, :tags, :user_id)'
+            'INSERT INTO task (title, priority, movement, due_date, tags, user_id, group_id)
+             VALUES (:title, :priority, :movement, :due, :tags, :user_id, :group_id)'
         );
         $stmt->execute([
             ':title'    => trim($body['title']),
@@ -111,7 +114,8 @@ switch ($method) {
             ':movement' => 'andante',
             ':due'      => !empty($body['due']) ? $body['due'] : null,
             ':tags'     => json_encode($body['desc'] ? [$body['desc']] : []),
-            ':user_id'  => $_SESSION['user_id'], // ← lie la tâche à l'user connecté
+            ':user_id'  => $_SESSION['user_id'],
+            ':group_id' => $userGroup, // lie la tâche au groupe du user
         ]);
 
         $newId = $db->lastInsertId();
