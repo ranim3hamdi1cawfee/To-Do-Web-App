@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Controller;
 
 use App\Entity\Task;
@@ -8,19 +7,18 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 
 
 class ModifyTaskController extends AbstractController
 {
-    #[Route('/tasks/{id}/edit', name: 'task_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function edit(
+    #[Route('/tasks/modify/{id}', name: 'task_modify', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function modify(
         int $id,
         Request $request,
         TaskRepository $taskRepo,
         EntityManagerInterface $em
     ): Response {
-
         $this->denyAccessUnlessGranted('ROLE_USER');
 
         $task = $taskRepo->find($id);
@@ -29,53 +27,53 @@ class ModifyTaskController extends AbstractController
             throw $this->createNotFoundException('Tâche introuvable (id = ' . $id . ').');
         }
 
-        $isAdmin   = $this->isGranted('ROLE_ADMIN');
-        $currentId = $this->getUser()?->getId();
+        $isAdmin = $this->isGranted('ROLE_ADMIN');
 
         if ($request->isMethod('POST')) {
 
-            // ─── Lire les valeurs envoyées ───
-            $newTitle    = trim($request->request->get('title', ''));
-            $newPriority = $request->request->get('priority', 'p');
-            $newMovement = $request->request->get('movement', 'andante');
-            $newDueDate  = trim($request->request->get('due_date', ''));
-            $tagsRaw     = trim($request->request->get('tags', ''));
+            $newStatus = $request->request->get('status', 'in progress');
+            $allowedStatuses = ['todo', 'in progress', 'done'];
 
-
-            // ─── Validation simple ───
-            if ($newTitle === '') {
-                $this->addFlash('error', 'Le titre est obligatoire.');
-                return $this->render('modify_task/edit.html.twig', [
-                    'task' => $task,
-                ]);
+            if (in_array($newStatus, $allowedStatuses, true)) {
+                $task->setStatus($newStatus);
             }
-
-
-            // ─── Modifier les champs ──
-
-            $task->setMovement($newMovement);
 
             if ($isAdmin) {
 
+                $newTitle    = trim($request->request->get('title', ''));
+                $newPriority = $request->request->get('priority', 'medium');
+                $newMovement = $request->request->get('movement', 'andante');
+                $newDueDate  = trim($request->request->get('due_date', ''));
+                $tagsRaw     = trim($request->request->get('tags', ''));
+
+
+                // Validation simple : le titre est obligatoire
+                if ($newTitle === '') {
+                    $this->addFlash('error', 'Le titre est obligatoire.');
+                    return $this->render('modify_task/edit.html.twig', [
+                        'task' => $task,
+                    ]);
+                }
+
+
+                // Modifier les autres champs
                 $task->setTitle($newTitle);
                 $task->setPriority($newPriority);
+                $task->setMovement($newMovement);
                 $task->setDueDate($newDueDate !== '' ? $newDueDate : null);
+
 
                 $tagsArray = $tagsRaw !== ''
                     ? array_map('trim', explode(',', $tagsRaw))
                     : [];
                 $task->setTags($tagsArray);
             }
-
-
-            // ─── Sauvegarder en BDD ───
             $em->flush();
 
             $this->addFlash('success', 'Tâche "' . $task->getTitle() . '" modifiée !');
 
             return $this->redirectToRoute('task_list');
         }
-
         return $this->render('modify_task/edit.html.twig', [
             'task' => $task,
         ]);
