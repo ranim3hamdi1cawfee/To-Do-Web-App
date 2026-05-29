@@ -5,6 +5,7 @@ header('Access-Control-Allow-Origin: http://localhost');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Access-Control-Allow-Credentials: true');
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
     exit;
@@ -34,43 +35,48 @@ function requireAdmin(): void
 }
 
 const STATUS_TO_MOVEMENT = [
-    'todo' => 'andante',
+    'todo'  => 'andante',
     'doing' => 'moderato',
-    'done' => 'allegro',
+    'done'  => 'allegro',
 ];
 const MOVEMENT_TO_STATUS = [
-    'andante' => 'todo',
+    'andante'  => 'todo',
     'moderato' => 'doing',
-    'allegro' => 'done',
+    'allegro'  => 'done',
 ];
 
 function normalizeTask(array $row): array
 {
-    $tags = $row['tags'] ?? '[]';
+    $tags        = $row['tags'] ?? '[]';
     $tagsDecoded = json_decode($tags, true);
     $description = is_array($tagsDecoded) ? implode(', ', $tagsDecoded) : ($tags ?? '');
     return [
-        'id' => (string) $row['id'],
-        'title' => $row['title'],
+        'id'          => (string) $row['id'],
+        'title'       => $row['title'],
         'description' => $description,
-        'priority' => $row['priority'] ?? 'medium',
-        'status' => MOVEMENT_TO_STATUS[$row['movement']] ?? 'todo',
-        'due_date' => $row['due_date'] ?? null,
-        'created_by' => 'system',
+        'priority'    => $row['priority'] ?? 'medium',
+        'status'      => MOVEMENT_TO_STATUS[$row['movement']] ?? 'todo',
+        'due_date'    => $row['due_date'] ?? null,
+        'created_by'  => 'system',
     ];
 }
 
 $method = $_SERVER['REQUEST_METHOD'];
-$id = $_GET['id'] ?? null;
-$body = json_decode(file_get_contents('php://input'), true) ?? [];
+$id     = $_GET['id'] ?? null;
+$body   = json_decode(file_get_contents('php://input'), true) ?? [];
 
 switch ($method) {
 
     case 'GET':
         requireLogin();
-        $db = getDB();
-        $sql = 'SELECT * FROM task WHERE 1=1';
-        $params = [];
+        $db  = getDB();
+
+        // ── CHANGEMENT : filtre par user_id connecté ──────────────────────
+        // Chaque user ne voit QUE ses propres tâches
+        // $_SESSION['user_id'] est défini lors du login
+        $sql    = 'SELECT * FROM task WHERE user_id = :user_id';
+        $params = [':user_id' => $_SESSION['user_id']];
+
         if (!empty($_GET['group'])) {
             $sql .= ' AND group_id = :group';
             $params[':group'] = $_GET['group'];
@@ -90,28 +96,38 @@ switch ($method) {
         requireLogin();
         if (empty($body['title']))
             respond(422, ['success' => false, 'error' => 'Titre obligatoire.']);
-        $db = getDB();
-        $stmt = $db->prepare('INSERT INTO task (title, priority, movement, due_date, tags)
-                               VALUES (:title, :priority, :movement, :due, :tags)');
+
+        $db   = getDB();
+
+        // ── CHANGEMENT : on insère aussi user_id dans la tâche ────────────
+        // La tâche est liée à l'utilisateur qui la crée
+        $stmt = $db->prepare(
+            'INSERT INTO task (title, priority, movement, due_date, tags, user_id)
+             VALUES (:title, :priority, :movement, :due, :tags, :user_id)'
+        );
         $stmt->execute([
-            ':title' => trim($body['title']),
+            ':title'    => trim($body['title']),
             ':priority' => $body['priority'] ?? 'medium',
             ':movement' => 'andante',
-            ':due' => !empty($body['due']) ? $body['due'] : null,
-            ':tags' => json_encode($body['desc'] ? [$body['desc']] : []),
+            ':due'      => !empty($body['due']) ? $body['due'] : null,
+            ':tags'     => json_encode($body['desc'] ? [$body['desc']] : []),
+            ':user_id'  => $_SESSION['user_id'], // ← lie la tâche à l'user connecté
         ]);
+
         $newId = $db->lastInsertId();
         $s = $db->prepare('SELECT * FROM task WHERE id = :id');
         $s->execute([':id' => $newId]);
         respond(201, ['success' => true, 'task' => normalizeTask($s->fetch())]);
 
     case 'PUT':
-        requireAdmin(); // seul admin peut modifier
+        requireAdmin();
         if (!$id)
             respond(400, ['success' => false, 'error' => 'id manquant.']);
-        $db = getDB();
-        $sets = [];
+
+        $db     = getDB();
+        $sets   = [];
         $params = [':id' => $id];
+
         if (array_key_exists('title', $body)) {
             $sets[] = 'title = :title';
             $params[':title'] = trim($body['title']);
@@ -128,22 +144,27 @@ switch ($method) {
             $sets[] = 'due_date = :due_date';
             $params[':due_date'] = $body['due'] === '' ? null : $body['due'];
         }
+
         if (empty($sets))
             respond(400, ['success' => false, 'error' => 'Rien à modifier.']);
+
         $db->prepare('UPDATE task SET ' . implode(', ', $sets) . ' WHERE id = :id')->execute($params);
         $s = $db->prepare('SELECT * FROM task WHERE id = :id');
         $s->execute([':id' => $id]);
         respond(200, ['success' => true, 'task' => normalizeTask($s->fetch())]);
 
     case 'DELETE':
-        requireAdmin(); // seul admin peut supprimer
+        requireAdmin();
         if (!$id)
             respond(400, ['success' => false, 'error' => 'id manquant.']);
-        $db = getDB();
+
+        $db   = getDB();
         $stmt = $db->prepare('DELETE FROM task WHERE id = :id');
         $stmt->execute([':id' => $id]);
+
         if ($stmt->rowCount() === 0)
             respond(404, ['success' => false, 'error' => 'Introuvable.']);
+
         respond(200, ['success' => true]);
 
     default:
